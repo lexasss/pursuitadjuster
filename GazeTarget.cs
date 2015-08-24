@@ -7,18 +7,20 @@ namespace SmoothVolume
 {
     public class GazeTarget
     {
-        private const double RADIUS = 0.35;          // fraction of the min(width, height)
+        private const double RADIUS = 0.35;         // fraction of the min(width, height)
         private const double INITIAL_ANGLE = 90;    // degrees
         private const int ACCELERATION_STEPS = 20;  // number of steps taken to speed up o the full spped and slow down to stop
         private const int STEP_DURATION = 25;       // ms
 
-        private System.Windows.Forms.Timer iTimer = new System.Windows.Forms.Timer();
-        private int iStepCounter;
-        private double iAngle;
-
         private readonly Point iCenter;
         private readonly double iRadius;
-        private readonly double iSpeed;              // degrees per step
+        private readonly double iSpeed;             // degrees per step
+
+        private System.Windows.Forms.Timer iTimer = new System.Windows.Forms.Timer();
+        private int iStepCounter;
+        private Angle iAngle;                       // degrees
+        private long iLastTimestamp = 0;
+        private long iChangeCount = 0;
 
         public class LocationChangedArgs: EventArgs
         {
@@ -34,6 +36,10 @@ namespace SmoothVolume
 
         public Bitmap Bitmap { get; private set; }
         public Point Location { get; private set; }
+
+        // Something funny is here:
+        // if STEP_DURATION = 25, then the expected number of steps per second is 40
+        // However, it really makes only 32 steps... WTF!!
         public double Speed { get { return iSpeed * 1000 / STEP_DURATION; } }  // degrees per second
         public double Radius { get { return iRadius; } }
 
@@ -66,17 +72,24 @@ namespace SmoothVolume
             iStepCounter = -ACCELERATION_STEPS;
         }
 
-        private double ToRadians(double aAngle)
-        {
-            return aAngle * Math.PI / 180;
-        }
-
         private void SetAngle(double aAngle)
         {
-            iAngle = aAngle;
+            iAngle = new Angle(aAngle, true);
 
-            double dx = iRadius * Math.Cos(ToRadians(iAngle));
-            double dy = iRadius * Math.Sin(ToRadians(iAngle));
+            iChangeCount++;
+            if (iSpeed > 0)
+            {
+                long ts = DateTime.Now.Ticks;
+                if (ts - iLastTimestamp > 9800000)
+                {
+                    iLastTimestamp = ts;
+                    Console.WriteLine(iAngle);
+                    Console.WriteLine(iChangeCount);
+                }
+            }
+
+            double dx = iRadius * Math.Cos(iAngle.Radians);
+            double dy = iRadius * Math.Sin(iAngle.Radians);
 
             Location = new Point(
                 (int)(iCenter.X - Bitmap.Width / 2 + dx), 
@@ -99,10 +112,11 @@ namespace SmoothVolume
                 double speed = iSpeed;
                 if (iStepCounter < ACCELERATION_STEPS)
                 {
-                    speed = iSpeed * Math.Sin( ToRadians( 90 * (Math.Abs((double)iStepCounter) / ACCELERATION_STEPS)));
+                    Angle angle = new Angle(90 * (Math.Abs((double)iStepCounter) / ACCELERATION_STEPS), true);
+                    speed = iSpeed * Math.Sin(angle.Radians);
                 }
 
-                SetAngle(iAngle + speed);
+                SetAngle(iAngle.Degrees + speed);
             }
         }
     }

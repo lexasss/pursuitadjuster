@@ -97,7 +97,7 @@ namespace SmoothVolume
 
         private void ETUDriver_OnRecordingStart()
         {
-            iParser.reset();
+            iParser.start();
             iKnob.start();
 
             SiETUDFloatPoint offset = new SiETUDFloatPoint();
@@ -116,6 +116,7 @@ namespace SmoothVolume
             EnabledMenuButtons();
             mbnToggle.Text = "Start";
 
+            iParser.stop();
             iKnob.stop();
         }
 

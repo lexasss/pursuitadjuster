@@ -8,16 +8,16 @@ namespace SmoothVolume
 {
     public sealed class Knob
     {
-        private readonly int IMAGE_WIDTH;
-        private readonly int IMAGE_HEIGHT;
-        private readonly int INDICATOR_WIDTH;
-        private readonly int INDICATOR_HEIGHT;
-        private const int INDICATOR_OFFSET = 150;
-        private const float MIN_ANGLE = -135;
-        private const float MAX_ANGLE = 135;
-        private const double TARGET_SPEED = 1.4;
-        private const double MIN_VALUE = 0;
+        private const int INDICATOR_OFFSET = 150;       // pixels
+        private const float MIN_ANGLE = -135;           // degrees
+        private const float MAX_ANGLE = 135;            // degrees
+        private const double TARGET_SPEED = 1.4;        // degrees per step
         private const double MAX_VALUE = 100;
+        
+        private readonly int iImageWidth;
+        private readonly int iImageHeight;
+        private readonly int iIndicatorWidth;
+        private readonly int iIndicatorHeight;
 
         private double iValue;
         private Image iIndicator;
@@ -27,16 +27,12 @@ namespace SmoothVolume
         private GazeTarget iDecrease;
         
         public double MaxValue { get { return MAX_VALUE; } }
-        public double Value   // 0-100
+        public double Value
         {
             get { return iValue; }
             set {
                 double prev = iValue;
-
-                if (MIN_VALUE < MAX_VALUE)
-                    iValue = Math.Max(0, Math.Min(100, value));
-                else
-                    iValue = value;
+                iValue = Math.Max(0, Math.Min(MAX_VALUE, value));
 
                 if (prev != iValue)
                     OnValueChanged(this, new ValueChangedArgs(prev, iValue)); 
@@ -71,14 +67,14 @@ namespace SmoothVolume
             iDecrease.OnLocationChanged += (s, e) => { OnRedraw(this, e); };
             iDecrease.OnVisibilityChanged += (s, e) => { OnRedraw(this, e); };
 
-            IMAGE_WIDTH = aImageSize.Width;
-            IMAGE_HEIGHT = aImageSize.Height;
+            iImageWidth = aImageSize.Width;
+            iImageHeight = aImageSize.Height;
 
             iIndicator = new Bitmap(global::SmoothVolume.Properties.Resources.indicator);
-            INDICATOR_WIDTH = iIndicator.Width;
-            INDICATOR_HEIGHT = iIndicator.Height;
+            iIndicatorWidth = iIndicator.Width;
+            iIndicatorHeight = iIndicator.Height;
 
-            iIndicatorLocation = new Point(-INDICATOR_WIDTH / 2, -INDICATOR_OFFSET);
+            iIndicatorLocation = new Point(-iIndicatorWidth / 2, -INDICATOR_OFFSET);
         }
 
         public void start()
@@ -96,8 +92,8 @@ namespace SmoothVolume
         public void draw(Graphics aGraphics)
         {
             var container = aGraphics.BeginContainer();
-            aGraphics.TranslateTransform(IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2);
-            aGraphics.RotateTransform(MIN_ANGLE + ((float)Value * (MAX_ANGLE - MIN_ANGLE) / 100));
+            aGraphics.TranslateTransform(iImageWidth / 2, iImageHeight / 2);
+            aGraphics.RotateTransform(MIN_ANGLE + (float)(Value * (MAX_ANGLE - MIN_ANGLE) / MAX_VALUE));
             aGraphics.DrawImage(iIndicator, iIndicatorLocation);
             aGraphics.EndContainer(container);
 

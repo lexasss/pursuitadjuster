@@ -15,21 +15,34 @@ namespace SmoothVolume
             Decrease
         };
 
+        private struct GazePoint
+        {
+            public int Timestamp;
+            public Point Point;
+            public GazePoint(int aTimestamp, Point aPoint)
+            {
+                Timestamp = aTimestamp;
+                Point = aPoint;
+            }
+        }
+
         private class Ray
         {
-            private static int AngleOffset = 0;
-            private static double LastAngle = 0.0;
-            
+            private static int AngleCycle = 0;
+            private static Angle LastAngle = new Angle();
+
             public int Timestamp;
             public double Length;
-            public double Angle;
-            
+            public Angle Angle;
+            /*
             public Ray(int aTimestamp, double aLength, double aAngle)
             {
                 Timestamp = aTimestamp;
                 Length = aLength;
-                Angle = EnsureAngleNotCirculed(aAngle);
-            }
+                Angle = new Angle(aAngle).Rotate(AngleCycle).KeepCloseTo(LastAngle, ref AngleCycle);
+
+                LastAngle = new Angle(Angle.Radians, Angle.Cycles);
+            }*/
 
             public Ray(int aTimestamp, Point aPoint, Point aCenter)
             {
@@ -37,7 +50,9 @@ namespace SmoothVolume
                 int dx = aPoint.X - aCenter.X;
                 int dy = aPoint.Y - aCenter.Y;
                 Length = Math.Sqrt(dx * dx + dy * dy);
-                Angle = EnsureAngleNotCirculed(Math.Atan2(dy, dx));
+                Angle = new Angle(Math.Atan2(dy, dx)).RotateBy(AngleCycle).KeepCloseTo(LastAngle, ref AngleCycle);
+
+                LastAngle = new Angle(Angle.Radians, Angle.Cycles);
             }
 
             public bool isInRange(double aMinLength, double aMaxLength)
@@ -45,75 +60,70 @@ namespace SmoothVolume
                 return aMinLength <= Length && Length <= aMaxLength;
             }
 
-            private double EnsureAngleNotCirculed(double aAngle)
+            public override string ToString()
             {
-                double angle = aAngle + AngleOffset * 2 * Math.PI;
-                if ((angle - LastAngle) > Math.PI)
-                {
-                    AngleOffset--;
-                    Console.WriteLine("-- Was {0} now {1}", angle, aAngle + AngleOffset * 2 * Math.PI);
-                    angle = aAngle + AngleOffset * 2 * Math.PI;
-                }
-                else if ((angle - LastAngle) < -Math.PI)
-                {
-                    AngleOffset++;
-                    Console.WriteLine("++ Was {0} now {1}", angle, aAngle + AngleOffset * 2 * Math.PI);
-                    angle = aAngle + AngleOffset * 2 * Math.PI;
-                }
-
-                LastAngle = angle;
-                return angle;
+                return new StringBuilder().
+                    AppendFormat("\t{0,8:N3}", Angle.Degrees).
+                    AppendFormat("\t{0,8:N1}", Length).
+                    ToString();
             }
         }
 
         private class GazeTrack
         {
-            public double Angle { get; private set; }
+            public Angle Angle { get; private set; }
             public int Duration { get; private set; }
-            public double Speed { get { return Angle * 1000 / Duration; } }
+            public double Speed { get { return Angle.Radians * 1000 / Duration; } }     // rad / sec
             public State State { get; set; }
             
             public GazeTrack(Ray aFirst, Ray aLast)
             {
-                double angle = aLast.Angle - aFirst.Angle;
-                if (angle < -Math.PI)
-                    angle += Math.PI;
-                else if (angle > Math.PI)
-                    angle -= Math.PI;
-
-                Angle = angle;
+                Angle = (aLast.Angle - aFirst.Angle).Normalize();
                 Duration = aLast.Timestamp - aFirst.Timestamp;
                 State = GazeParser.State.Unknown;
             }
-
+            /*
             public GazeTrack(double aAngle, int aDuration)
             {
                 Angle = aAngle;
                 Duration = aDuration;
                 State = GazeParser.State.Unknown;
-            }
+            }*/
 
             public bool isSpeedInRange(double aMin, double aMax)
             {
                 var speed = this.Speed;
                 return aMin <= speed && speed <= aMax;
             }
+
+            public override string ToString()
+            {
+                return new StringBuilder().
+                    AppendFormat("\t{0,8:N3}", Angle.Degrees).
+                    AppendFormat("\t{0,12}", Duration).
+                    AppendFormat("\t{0,8:N3}", Speed).
+                    AppendFormat("\t{0}", State).
+                    ToString();
+            }
         }
 
-        private const int BUFFER_DURATION = 1000;   // ms
+        private const int BUFFER_DURATION = 1000;           // ms
         private const int MIN_BUFFER_DURATION = (int)(0.7 * BUFFER_DURATION);   // ms
-        private const double RADIUS_ERROR_THRESHOLD = 0.2; // fraction
-        private const double SPEED_ERROR_THRESHOLD = 0.4; // fraction
-        private const double ANGLE_CHANGE = 1;      // degrees
-        private const double MIN_FIX_DIST = 50;      // pixels
+        private const double RADIUS_ERROR_THRESHOLD = 0.2;  // fraction
+        private const double SPEED_ERROR_THRESHOLD = 0.4;   // fraction
+        private const double ANGLE_CHANGE = 1;              // degrees
+        private const double MIN_FIX_DIST = 50;             // pixels
 
         private bool iReady = false;
         private Point iLastPoint = Point.Empty;
-        private Queue<Ray> iBuffer = new Queue<Ray>();
+        private Queue<Ray> iRayBuffer = new Queue<Ray>();
+
+        private Queue<GazePoint> iPointBuffer = new Queue<GazePoint>();
+        private System.Windows.Forms.Timer iPointsTimer = new System.Windows.Forms.Timer();
 
         private Point iCenter;
         private double iRadius;
-        private double iExpectedSpeed;  // radians per second
+        private double iExpectedSpeed;                      // rad / sec
 
         public class AngleChangedArgs : EventArgs
         {
@@ -131,17 +141,76 @@ namespace SmoothVolume
             iCenter = new Point(aCenterX, aCenterY);
             iRadius = aRadius;
             iExpectedSpeed = aExpectedSpeed * Math.PI / 180;
-            Console.WriteLine("Radius limits: {0} - {1}", iRadius * (1.0 - RADIUS_ERROR_THRESHOLD), iRadius * (1.0 + RADIUS_ERROR_THRESHOLD));
-            Console.WriteLine("Speed limits: {0} - {1}", iExpectedSpeed * (1 - SPEED_ERROR_THRESHOLD), iExpectedSpeed * (1 + SPEED_ERROR_THRESHOLD));
+
+            iPointsTimer.Interval = 30;
+            iPointsTimer.Tick += PointsTimer_Tick;
+
+            Console.WriteLine("Radius: {0} [{1} - {2}]", iRadius, iRadius * (1.0 - RADIUS_ERROR_THRESHOLD), iRadius * (1.0 + RADIUS_ERROR_THRESHOLD));
+            Console.WriteLine("Expected speed: {0:N3} [{1:N3} - {2:N3}]", iExpectedSpeed, iExpectedSpeed * (1 - SPEED_ERROR_THRESHOLD), iExpectedSpeed * (1 + SPEED_ERROR_THRESHOLD));
         }
 
-        public void reset()
+        public void start()
         {
             iReady = false;
-            iBuffer.Clear();
+            iRayBuffer.Clear();
+            iPointBuffer.Clear();
+            iPointsTimer.Start();
+        }
+
+        public void stop()
+        {
+            iPointsTimer.Stop();
         }
 
         public void feed(int aTimestamp, Point aPoint)
+        {
+            lock (iPointBuffer)
+            {
+                iPointBuffer.Enqueue(new GazePoint(aTimestamp, aPoint));
+            }
+        }
+
+        private void LimitBuffer(int aTimestamp)
+        {
+            while (iRayBuffer.Count > 0 && aTimestamp - iRayBuffer.Peek().Timestamp > BUFFER_DURATION)
+            {
+                iRayBuffer.Dequeue();
+                iReady = true;
+            }
+
+            iReady = iReady && iRayBuffer.Count > 1;
+        }
+
+        private void EnsureSmoothPursuit(Point aPoint)
+        {
+            if (!iLastPoint.IsEmpty)
+            {
+                int dx = aPoint.X - iLastPoint.X;
+                int dy = aPoint.Y - iLastPoint.Y;
+                double dist = Math.Sqrt(dx * dx + dy * dy);
+                if (dist > MIN_FIX_DIST)
+                {
+                    iRayBuffer.Clear();
+                }
+            }
+
+            iLastPoint = aPoint;
+            iReady = iReady && iRayBuffer.Count > 1;
+        }
+
+        private GazeTrack ComputeTrack(Ray aRayLast)
+        {
+            Ray rayFirst = iRayBuffer.Peek();
+            GazeTrack track = new GazeTrack(rayFirst, aRayLast);
+            if (track.isSpeedInRange(iExpectedSpeed * (1 - SPEED_ERROR_THRESHOLD), iExpectedSpeed * (1 + SPEED_ERROR_THRESHOLD)))
+                track.State = State.Increase;
+            else if (track.isSpeedInRange(-iExpectedSpeed * (1 + SPEED_ERROR_THRESHOLD), -iExpectedSpeed * (1 - SPEED_ERROR_THRESHOLD)))
+                track.State = State.Decrease;
+
+            return track;
+        }
+
+        private void ProcessNewPoint(int aTimestamp, Point aPoint)
         {
             LimitBuffer(aTimestamp);
             EnsureSmoothPursuit(aPoint);
@@ -149,7 +218,7 @@ namespace SmoothVolume
             Ray newRay = new Ray(aTimestamp, aPoint, iCenter);
             if (newRay.isInRange(iRadius * (1.0 - RADIUS_ERROR_THRESHOLD), iRadius * (1.0 + RADIUS_ERROR_THRESHOLD)))
             {
-                iBuffer.Enqueue(newRay);
+                iRayBuffer.Enqueue(newRay);
 
                 if (iReady)
                 {
@@ -159,7 +228,7 @@ namespace SmoothVolume
                         OnAngleChanged(this, new AngleChangedArgs(ANGLE_CHANGE));
                     else if (track.State == State.Decrease)
                         OnAngleChanged(this, new AngleChangedArgs(-ANGLE_CHANGE));
-                    //Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", newRay.Length - iRadius, ToDegrees(newRay.Angle), ToDegrees(track.Angle), track.Duration, track.Speed, track.State);
+                    //Console.WriteLine("{0}\t\t|\t\t{1}", newRay, track);
                 }
                 else
                 {
@@ -172,49 +241,31 @@ namespace SmoothVolume
             }
         }
 
-        private void LimitBuffer(int aTimestamp)
+        private void PointsTimer_Tick(object sender, EventArgs e)
         {
-            while (iBuffer.Count > 0 && aTimestamp - iBuffer.Peek().Timestamp > BUFFER_DURATION)
-            {
-                iBuffer.Dequeue();
-                iReady = true;
-            }
+            int timestamp = 0;
+            Point point = new Point(0, 0);
+            int bufferSize = 0;
 
-            iReady = iReady && iBuffer.Count > 1;
-        }
-
-        private void EnsureSmoothPursuit(Point aPoint)
-        {
-            if (!iLastPoint.IsEmpty)
+            lock (iPointBuffer)
             {
-                int dx = aPoint.X - iLastPoint.X;
-                int dy = aPoint.Y - iLastPoint.Y;
-                double dist = Math.Sqrt(dx * dx + dy * dy);
-                if (dist > MIN_FIX_DIST)
+                while (iPointBuffer.Count > 0)
                 {
-                    iBuffer.Clear();
+                    GazePoint gp = iPointBuffer.Dequeue();
+                    timestamp = gp.Timestamp;
+                    point.X += gp.Point.X;
+                    point.Y += gp.Point.Y;
+                    bufferSize++;
                 }
             }
 
-            iLastPoint = aPoint;
-            iReady = iReady && iBuffer.Count > 1;
-        }
+            if (bufferSize > 0)
+            {
+                point.X /= bufferSize;
+                point.Y /= bufferSize;
 
-        private GazeTrack ComputeTrack(Ray aRayLast)
-        {
-            Ray rayFirst = iBuffer.Peek();
-            GazeTrack track = new GazeTrack(rayFirst, aRayLast);
-            if (track.isSpeedInRange(iExpectedSpeed * (1 - SPEED_ERROR_THRESHOLD), iExpectedSpeed * (1 + SPEED_ERROR_THRESHOLD)))
-                track.State = State.Increase;
-            else if (track.isSpeedInRange(-iExpectedSpeed * (1 + SPEED_ERROR_THRESHOLD), -iExpectedSpeed * (1 - SPEED_ERROR_THRESHOLD)))
-                track.State = State.Decrease;
-
-            return track;
-        }
-
-        private double ToDegrees(double aRadians)
-        {
-            return aRadians * 180 / Math.PI;
+                ProcessNewPoint(timestamp, point);
+            }
         }
     }
 }
