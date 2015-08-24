@@ -19,8 +19,10 @@ namespace SmoothVolume
         private System.Windows.Forms.Timer iTimer = new System.Windows.Forms.Timer();
         private int iStepCounter;
         private Angle iAngle;                       // degrees
-        private long iLastTimestamp = 0;
-        private long iChangeCount = 0;
+
+        // improved timer
+        private long iStartTimestamp = 0;
+        private HiResTimer iHRTimer = new HiResTimer();
 
         public class LocationChangedArgs: EventArgs
         {
@@ -38,8 +40,10 @@ namespace SmoothVolume
         public Point Location { get; private set; }
 
         // Something funny is here:
-        // if STEP_DURATION = 25, then the expected number of steps per second is 40
-        // However, it really makes only 32 steps... WTF!!
+        //      if STEP_DURATION = 25, then the expected number of steps per second is 40
+        //      However, it really makes only 32 steps... WTF!!
+        //      MadFix: 1000 must be replaced by 800
+        //      Better fix - controlling the duration since start and adjusting the timer interval
         public double Speed { get { return iSpeed * 1000 / STEP_DURATION; } }  // degrees per second
         public double Radius { get { return iRadius; } }
 
@@ -65,6 +69,8 @@ namespace SmoothVolume
             SetAngle(INITIAL_ANGLE + 2 * iSpeed);
 
             iTimer.Start();
+
+            iStartTimestamp = iHRTimer.Milliseconds;
         }
 
         public void hide()
@@ -75,18 +81,6 @@ namespace SmoothVolume
         private void SetAngle(double aAngle)
         {
             iAngle = new Angle(aAngle, true);
-
-            iChangeCount++;
-            if (iSpeed > 0)
-            {
-                long ts = DateTime.Now.Ticks;
-                if (ts - iLastTimestamp > 9800000)
-                {
-                    iLastTimestamp = ts;
-                    Console.WriteLine(iAngle);
-                    Console.WriteLine(iChangeCount);
-                }
-            }
 
             double dx = iRadius * Math.Cos(iAngle.Radians);
             double dy = iRadius * Math.Sin(iAngle.Radians);
@@ -106,6 +100,7 @@ namespace SmoothVolume
                 iTimer.Stop();
                 Location = new Point(-100, -100);
                 OnVisibilityChanged(this, new EventArgs());
+                return;
             }
             else
             {
@@ -118,6 +113,21 @@ namespace SmoothVolume
 
                 SetAngle(iAngle.Degrees + speed);
             }
+
+            // Improving timer
+            iTimer.Stop();
+            if (iStepCounter > 0)
+            {
+                long timestamp = iHRTimer.Milliseconds - iStartTimestamp;
+                int delay = Math.Max((int)(timestamp - iStepCounter * STEP_DURATION), 0);
+                iTimer.Interval = Math.Max(3, STEP_DURATION - delay);
+            }
+            else
+            {
+                iTimer.Interval = STEP_DURATION;
+            }
+
+            iTimer.Start();
         }
     }
 }

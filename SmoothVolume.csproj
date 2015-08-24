@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="Angle.cs" />
     <Compile Include="GazeTarget.cs" />
+    <Compile Include="HiResTimer.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
