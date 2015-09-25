@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Drawing;
 
 namespace SmoothVolume
 {
     public class GazeParser
     {
+        #region Declarations
+
         private struct GazePoint
         {
             public int Timestamp;
@@ -19,14 +19,30 @@ namespace SmoothVolume
             }
         }
 
-        private const double MIN_FIX_DIST = 50;             // pixels
+        #endregion
+
+        #region Consts
+
+        private const double MIN_FIX_DIST = 50;      // pixels
+
+        #endregion
+
+        #region Internal members
 
         private Point iLastPoint = Point.Empty;
 
         private Queue<GazePoint> iPointBuffer = new Queue<GazePoint>();
         private System.Windows.Forms.Timer iPointsTimer = new System.Windows.Forms.Timer();
 
-        public IGazeControllable Control { get; set; }
+        #endregion
+
+        #region Properties
+
+        public IPursueDetector PursueDetector { get; set; }
+
+        #endregion
+
+        #region Public methods
 
         public GazeParser()
         {
@@ -36,9 +52,9 @@ namespace SmoothVolume
 
         public void start()
         {
-            if (Control != null)
+            if (PursueDetector != null)
             {
-                Control.invalidate();
+                PursueDetector.start();
             }
 
             iPointBuffer.Clear();
@@ -58,16 +74,20 @@ namespace SmoothVolume
             }
         }
 
+        #endregion
+
+        #region Internal methods
+
         private void EnsureSmoothPursuit(Point aPoint)
         {
-            if (!iLastPoint.IsEmpty && Control != null)
+            if (!iLastPoint.IsEmpty && PursueDetector != null)
             {
                 int dx = aPoint.X - iLastPoint.X;
                 int dy = aPoint.Y - iLastPoint.Y;
                 double dist = Math.Sqrt(dx * dx + dy * dy);
                 if (dist > MIN_FIX_DIST)
                 {
-                    Control.invalidate();
+                    PursueDetector.saccade();
                 }
             }
 
@@ -78,9 +98,9 @@ namespace SmoothVolume
         {
             EnsureSmoothPursuit(aPoint);
 
-            if (Control != null)
+            if (PursueDetector != null)
             {
-                Control.addGazePoint(aTimestamp, aPoint);
+                PursueDetector.addGazePoint(aTimestamp, aPoint);
             }
         }
 
@@ -110,5 +130,7 @@ namespace SmoothVolume
                 ProcessNewPoint(timestamp, point);
             }
         }
+
+        #endregion
     }
 }

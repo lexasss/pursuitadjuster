@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 
-namespace SmoothVolume
+namespace SmoothVolume.Rotation
 {
-    public class RotationDetector : IGazeControllable
+    internal class PursueDetector : IPursueDetector
     {
         #region Declarations
 
@@ -32,7 +32,7 @@ namespace SmoothVolume
                 int dx = aPoint.X - aCenter.X;
                 int dy = aPoint.Y - aCenter.Y;
                 Length = Math.Sqrt(dx * dx + dy * dy);
-                Angle = new Angle(Math.Atan2(dy, dx)).RotateBy(AngleCycle).KeepCloseTo(LastAngle, ref AngleCycle);
+                Angle = new Angle(Math.Atan2(dy, dx)).rotateBy(AngleCycle).keepCloseTo(LastAngle, ref AngleCycle);
 
                 LastAngle = new Angle(Angle.Radians, Angle.Cycles);
             }
@@ -60,7 +60,7 @@ namespace SmoothVolume
 
             public GazeTrack(Ray aFirst, Ray aLast)
             {
-                Angle = (aLast.Angle - aFirst.Angle).Normalize();
+                Angle = (aLast.Angle - aFirst.Angle).normalize();
                 Duration = aLast.Timestamp - aFirst.Timestamp;
                 State = State.Unknown;
             }
@@ -129,7 +129,7 @@ namespace SmoothVolume
 
         #region Public methods
 
-        public RotationDetector(int aCenterX, int aCenterY, double aRadius, double aExpectedSpeed)
+        public PursueDetector(int aCenterX, int aCenterY, double aRadius, double aExpectedSpeed)
         {
             iCenter = new Point(aCenterX, aCenterY);
             iRadius = aRadius;
@@ -139,7 +139,13 @@ namespace SmoothVolume
             //Console.WriteLine("Expected speed: {0:N3} [{1:N3} - {2:N3}]", iExpectedSpeed, iExpectedSpeed * (1 - SPEED_ERROR_THRESHOLD), iExpectedSpeed * (1 + SPEED_ERROR_THRESHOLD));
         }
 
-        public void invalidate()
+        public void start()
+        {
+            iReady = false;
+            iRayBuffer.Clear();
+        }
+
+        public void saccade()
         {
             iReady = false;
             iRayBuffer.Clear();

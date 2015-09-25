@@ -17,7 +17,9 @@ namespace SmoothVolume
         private CoETUDriver iETUDriver;
         private GazeParser iParser;
         private Utils.Player iPlayer;
-        private Knob iKnob;
+        private IGazeControl iGazeControl;
+
+        private Rotation.Knob iKnob;
 
         private TheCodeKing.ActiveButtons.Controls.IActiveMenu iMenu;
         private TheCodeKing.ActiveButtons.Controls.ActiveButton mbnOptions;
@@ -35,15 +37,16 @@ namespace SmoothVolume
             iETUDriver.OnCalibrated += ETUDriver_OnCalibrated;
             iETUDriver.OnDataEvent += ETUDriver_OnDataEvent;
 
-            iKnob = new Knob(pcbKnob.Size);
-            iKnob.OnValueChanged += Knob_OnValueChnaged;
+            iKnob = new Rotation.Knob();
+            //iKnob.OnValueChanged += Knob_OnValueChnaged;
+            iKnob.OnSoundPlayRequest += Knob_OnSoundPlayRequest;
             iKnob.OnRedraw += Knob_OnRedraw;
 
-            RotationDetector rotationDetector = new RotationDetector(pcbKnob.Width / 2, pcbKnob.Height / 2, iKnob.TargetRadius, iKnob.TargetSpeed);
-            rotationDetector.OnAngleChanged += (s, e) => { this.Invoke(new Action(() => { iKnob.Value += e.AngleChange; })); };
-
             iParser = new GazeParser();
-            iParser.Control = rotationDetector;
+
+            iGazeControl = iKnob;
+            iParser.PursueDetector = iGazeControl.PursueDetector;
+            pcbControl.Image = iGazeControl.Image;
 
             iPlayer = new Utils.WavPlayer();
             iPlayer.init();
@@ -84,9 +87,15 @@ namespace SmoothVolume
             mbnToggle.Click += (s, e) =>
             {
                 if (iETUDriver.Active == 0)
+                {
+                    pcbControl.Show();
                     iETUDriver.startTracking();
+                }
                 else
+                {
                     iETUDriver.stopTracking();
+                    pcbControl.Hide();
+                }
             };
 
             iMenu.Items.Add(mbnToggle);
@@ -102,7 +111,7 @@ namespace SmoothVolume
         private void ETUDriver_OnRecordingStart()
         {
             iParser.start();
-            iKnob.start();
+            iGazeControl.start();
 
             SiETUDFloatPoint offset = new SiETUDFloatPoint();
             Rectangle r = this.ClientRectangle;
@@ -121,7 +130,7 @@ namespace SmoothVolume
             mbnToggle.Text = "Start";
 
             iParser.stop();
-            iKnob.stop();
+            iGazeControl.stop();
         }
 
         private void ETUDriver_OnDataEvent(EiETUDGazeEvent aEventID, ref int aData, ref int aResult)
@@ -129,33 +138,25 @@ namespace SmoothVolume
             if (aEventID == EiETUDGazeEvent.geSample)
             {
                 SiETUDSample smp = iETUDriver.LastSample;
-                Point pt = pcbKnob.PointToClient(new Point((int)smp.X[0], (int)smp.Y[0]));
+                Point pt = pcbControl.PointToClient(new Point((int)smp.X[0], (int)smp.Y[0]));
                 iParser.feed(smp.Time, pt);
             }
         }
 
         public void Knob_OnRedraw(object sender, EventArgs e)
         {
-            pcbKnob.Invoke(new Action(pcbKnob.Refresh));
+            pcbControl.Invoke(new Action(pcbControl.Refresh));
         }
 
-        private void Knob_OnValueChnaged(object sender, Knob.ValueChangedArgs e)
+        private void Knob_OnSoundPlayRequest(object sender, Rotation.Knob.SoundPlayRequestArgs e)
         {
-            int prev = (int)Math.Round(e.Prev);
-            int current = (int)Math.Round(e.Current);
-
-            uint volume = 1 + (uint)Math.Round(15 * e.Current / iKnob.MaxValue);
-            iPlayer.setVolume(0, volume, volume);
-
-            if ((int)(prev / 3) != (int)(current / 3))
-            {
-                iPlayer.play("sounds\\click.wav", "", 0);
-            }
+            iPlayer.setVolume(0, e.Volume, e.Volume);
+            iPlayer.play("sounds\\click.wav", "", 0);
         }
 
-        private void pcbKnob_Paint(object sender, PaintEventArgs e)
+        private void pcbControl_Paint(object sender, PaintEventArgs e)
         {
-            iKnob.draw(e.Graphics);
+            iGazeControl.draw(e.Graphics);
         }
     }
 }

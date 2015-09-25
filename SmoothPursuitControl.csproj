@@ -53,10 +53,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Angle.cs" />
-    <Compile Include="RotationCue.cs" />
-    <Compile Include="HiResTimestamp.cs" />
-    <Compile Include="IGazeControllable.cs" />
+    <Compile Include="Rotation\Angle.cs" />
+    <Compile Include="IGazeControl.cs" />
+    <Compile Include="Rotation\Cue.cs" />
+    <Compile Include="Libs\HiResTimestamp.cs" />
+    <Compile Include="IPursueDetector.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -64,8 +65,8 @@
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="GazeParser.cs" />
-    <Compile Include="Knob.cs" />
-    <Compile Include="MicroLib.cs" />
+    <Compile Include="Rotation\Knob.cs" />
+    <Compile Include="Libs\MicroLib.cs" />
     <Compile Include="Player\Declarations.cs" />
     <Compile Include="Player\Device.cs" />
     <Compile Include="Player\NAudioPlayer.cs" />
@@ -74,7 +75,7 @@
     <Compile Include="Player\WavPlayer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RotationDetector.cs" />
+    <Compile Include="Rotation\PursueDetector.cs" />
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -124,6 +125,7 @@
   <ItemGroup>
     <None Include="res\decrease.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

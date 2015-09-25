@@ -4,12 +4,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SmoothVolume
+namespace SmoothVolume.Rotation
 {
     public class Angle
     {
+        #region Consts
+
         private const double CYCLE = 2 * Math.PI;
+
+        #endregion
+
+        #region Internal members
+
         private int iCycles = 0;
+
+        #endregion
+
+        #region Properties
 
         public int Cycles { get { return iCycles; } }
         public double Radians { get; set; }
@@ -18,6 +29,10 @@ namespace SmoothVolume
             get { return Radians * 180.0 / Math.PI; }
             set { Radians = value * Math.PI / 180.0; }
         }
+
+        #endregion
+
+        #region Public methods
 
         public Angle()
         {
@@ -56,14 +71,14 @@ namespace SmoothVolume
             return new Angle(aAngle1.Radians + aAngle2.Radians);
         }
 
-        public Angle RotateBy(int aCycles)
+        public Angle rotateBy(int aCycles)
         {
             iCycles += aCycles;
             Radians += aCycles * CYCLE;
             return this;
         }
 
-        public Angle KeepCloseTo(Angle aRef, ref int aCycles)
+        public Angle keepCloseTo(Angle aRef, ref int aCycles)
         {
             if ((Radians - aRef.Radians) > Math.PI)
             {
@@ -78,7 +93,7 @@ namespace SmoothVolume
             return this;
         }
 
-        public Angle Normalize()
+        public Angle normalize()
         {
             iCycles = 0;
 
@@ -94,6 +109,10 @@ namespace SmoothVolume
         {
             return String.Format("D: {0:N1}, R: {1:N3}", Degrees, Radians);
         }
+
+        #endregion
+
+        #region Internal methods
 
         private int CalcCycles()
         {
@@ -112,5 +131,7 @@ namespace SmoothVolume
             }
             return result;
         }
+
+        #endregion
     }
 }

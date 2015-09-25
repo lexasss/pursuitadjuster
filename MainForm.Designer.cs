@@ -28,37 +28,37 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.pcbKnob = new System.Windows.Forms.PictureBox();
-            ((System.ComponentModel.ISupportInitialize)(this.pcbKnob)).BeginInit();
+            this.pcbControl = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(this.pcbControl)).BeginInit();
             this.SuspendLayout();
             // 
-            // pcbKnob
+            // pcbControl
             // 
-            this.pcbKnob.Image = global::SmoothVolume.Properties.Resources.knob;
-            this.pcbKnob.Location = new System.Drawing.Point(0, 0);
-            this.pcbKnob.Name = "pcbKnob";
-            this.pcbKnob.Size = new System.Drawing.Size(500, 500);
-            this.pcbKnob.TabIndex = 0;
-            this.pcbKnob.TabStop = false;
-            this.pcbKnob.Paint += new System.Windows.Forms.PaintEventHandler(this.pcbKnob_Paint);
+            this.pcbControl.Location = new System.Drawing.Point(0, 0);
+            this.pcbControl.Name = "pcbControl";
+            this.pcbControl.Size = new System.Drawing.Size(500, 500);
+            this.pcbControl.TabIndex = 0;
+            this.pcbControl.TabStop = false;
+            this.pcbControl.Visible = false;
+            this.pcbControl.Paint += new System.Windows.Forms.PaintEventHandler(this.pcbControl_Paint);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(503, 500);
-            this.Controls.Add(this.pcbKnob);
+            this.Controls.Add(this.pcbControl);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "MainForm";
             this.Text = "Smooth Volume";
-            ((System.ComponentModel.ISupportInitialize)(this.pcbKnob)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pcbControl)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.PictureBox pcbKnob;
+        private System.Windows.Forms.PictureBox pcbControl;
     }
 }
 

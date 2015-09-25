@@ -6,9 +6,10 @@ using System.Drawing;
 
 namespace SmoothVolume
 {
-    public interface IGazeControllable
+    public interface IPursueDetector
     {
-        void invalidate();
+        void start();
+        void saccade();
         void addGazePoint(int aTimestamp, Point aPoint);
     }
 }

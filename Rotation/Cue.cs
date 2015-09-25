@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 
-namespace SmoothVolume
+namespace SmoothVolume.Rotation
 {
-    public class RotationCue
+    internal class Cue
     {
         #region Consts
 
@@ -81,7 +81,7 @@ namespace SmoothVolume
 
         #region Public methods
 
-        public RotationCue(Bitmap aBitmap, Size aKnobSize, double aSpeed)
+        public Cue(Bitmap aBitmap, Size aKnobSize, double aSpeed)
         {
             Bitmap = aBitmap;
             iSpeed = aSpeed;
