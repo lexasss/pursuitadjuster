@@ -5,12 +5,18 @@ using System.Text;
 
 namespace SmoothVolume
 {
-    public class GazeTarget
+    public class RotationCue
     {
+        #region Consts
+
         private const double RADIUS = 0.35;         // fraction of the min(width, height)
         private const double INITIAL_ANGLE = 90;    // degrees
         private const int ACCELERATION_STEPS = 20;  // number of steps taken to speed up to the full speed and to slow down to stop
         private const int STEP_DURATION = 25;       // ms
+
+        #endregion
+
+        #region Internal members
 
         private readonly Point iCenter;
         private readonly double iRadius;
@@ -27,6 +33,10 @@ namespace SmoothVolume
         // private System.Windows.Forms.Timer iTimer = new System.Windows.Forms.Timer();
         MicroLib.MicroTimer iTimer = new MicroLib.MicroTimer();
 
+        #endregion
+
+        #region Events
+
         public class LocationChangedArgs: EventArgs
         {
             public Point Location { get; private set; }
@@ -38,6 +48,10 @@ namespace SmoothVolume
         public delegate void LocationChangedHandler(object aSender, LocationChangedArgs aArgs);
         public event LocationChangedHandler OnLocationChanged = delegate { };
         public event EventHandler OnVisibilityChanged = delegate { };
+
+        #endregion
+
+        #region Properties
 
         public Bitmap Bitmap { get; private set; }
         public Point Location
@@ -63,7 +77,11 @@ namespace SmoothVolume
         public double Speed { get { return iSpeed * 1000 / STEP_DURATION; } }  // degrees per second
         public double Radius { get { return iRadius; } }
 
-        public GazeTarget(Bitmap aBitmap, Size aKnobSize, double aSpeed)
+        #endregion
+
+        #region Public methods
+
+        public RotationCue(Bitmap aBitmap, Size aKnobSize, double aSpeed)
         {
             Bitmap = aBitmap;
             iSpeed = aSpeed;
@@ -93,6 +111,10 @@ namespace SmoothVolume
         {
             iStepCounter = -ACCELERATION_STEPS;
         }
+
+        #endregion
+
+        #region Internal methods
 
         private void SetAngle(double aAngle)
         {
@@ -152,5 +174,7 @@ namespace SmoothVolume
             iTimer.Start();
              */
         }
+
+        #endregion
     }
 }

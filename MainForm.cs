@@ -36,14 +36,14 @@ namespace SmoothVolume
             iETUDriver.OnDataEvent += ETUDriver_OnDataEvent;
 
             iKnob = new Knob(pcbKnob.Size);
-            iKnob.OnValueChanged += OnValueChnaged;
+            iKnob.OnValueChanged += Knob_OnValueChnaged;
             iKnob.OnRedraw += Knob_OnRedraw;
 
-            Rotation rotation = new Rotation(pcbKnob.Width / 2, pcbKnob.Height / 2, iKnob.TargetRadius, iKnob.TargetSpeed);
-            rotation.OnAngleChanged += (s, e) => { this.Invoke(new Action(() => { iKnob.Value += e.AngleChange; })); };
+            RotationDetector rotationDetector = new RotationDetector(pcbKnob.Width / 2, pcbKnob.Height / 2, iKnob.TargetRadius, iKnob.TargetSpeed);
+            rotationDetector.OnAngleChanged += (s, e) => { this.Invoke(new Action(() => { iKnob.Value += e.AngleChange; })); };
 
             iParser = new GazeParser();
-            iParser.Control = rotation;
+            iParser.Control = rotationDetector;
 
             iPlayer = new Utils.WavPlayer();
             iPlayer.init();
@@ -136,11 +136,10 @@ namespace SmoothVolume
 
         public void Knob_OnRedraw(object sender, EventArgs e)
         {
-            //pcbKnob.Refresh();
             pcbKnob.Invoke(new Action(pcbKnob.Refresh));
         }
 
-        private void OnValueChnaged(object sender, Knob.ValueChangedArgs e)
+        private void Knob_OnValueChnaged(object sender, Knob.ValueChangedArgs e)
         {
             int prev = (int)Math.Round(e.Prev);
             int current = (int)Math.Round(e.Current);

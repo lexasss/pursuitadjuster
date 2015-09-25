@@ -8,6 +8,8 @@ namespace SmoothVolume
 {
     public sealed class Knob
     {
+        #region Consts
+
         private const int INDICATOR_OFFSET = 150;       // pixels
         private const float MIN_ANGLE = -135;           // degrees
         private const float MAX_ANGLE = 135;            // degrees
@@ -19,13 +21,21 @@ namespace SmoothVolume
         private readonly int iIndicatorWidth;
         private readonly int iIndicatorHeight;
 
+        #endregion
+
+        #region Internal members
+
         private double iValue;
         private Image iIndicator;
         private Point iIndicatorLocation;
 
-        private GazeTarget iIncrease;
-        private GazeTarget iDecrease;
-        
+        private RotationCue iIncrease;
+        private RotationCue iDecrease;
+
+        #endregion
+
+        #region Properties
+
         public double MaxValue { get { return MAX_VALUE; } }
         public double Value
         {
@@ -42,6 +52,10 @@ namespace SmoothVolume
         public double TargetSpeed { get { return iIncrease.Speed; } }
         public double TargetRadius { get { return iIncrease.Radius; } }
 
+        #endregion
+
+        #region Events
+
         public class ValueChangedArgs: EventArgs
         {
             public double Prev { get; private set; }
@@ -56,14 +70,18 @@ namespace SmoothVolume
         public event ValueChangedHandler OnValueChanged = delegate { };
         public event EventHandler OnRedraw = delegate { };
 
+        #endregion
+
+        #region Public methods
+
         public Knob(Size aImageSize)
         {
             Value = 50;
 
-            iIncrease = new GazeTarget(global::SmoothVolume.Properties.Resources.increase, aImageSize, TARGET_SPEED);
+            iIncrease = new RotationCue(global::SmoothVolume.Properties.Resources.increase, aImageSize, TARGET_SPEED);
             iIncrease.OnVisibilityChanged += (s, e) => { OnRedraw(this, e); };
             
-            iDecrease = new GazeTarget(global::SmoothVolume.Properties.Resources.decrease, aImageSize, -TARGET_SPEED);
+            iDecrease = new RotationCue(global::SmoothVolume.Properties.Resources.decrease, aImageSize, -TARGET_SPEED);
             iDecrease.OnLocationChanged += (s, e) => { OnRedraw(this, e); };
             iDecrease.OnVisibilityChanged += (s, e) => { OnRedraw(this, e); };
 
@@ -100,5 +118,7 @@ namespace SmoothVolume
             aGraphics.DrawImage(iIncrease.Bitmap, iIncrease.Location);
             aGraphics.DrawImage(iDecrease.Bitmap, iDecrease.Location);
         }
+
+        #endregion
     }
 }

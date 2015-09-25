@@ -6,7 +6,7 @@ using System.Drawing;
 
 namespace SmoothVolume
 {
-    public class Rotation : IGazeControllable
+    public class RotationDetector : IGazeControllable
     {
         #region Declarations
 
@@ -25,15 +25,6 @@ namespace SmoothVolume
             public int Timestamp;
             public double Length;
             public Angle Angle;
-            /*
-            public Ray(int aTimestamp, double aLength, double aAngle)
-            {
-                Timestamp = aTimestamp;
-                Length = aLength;
-                Angle = new Angle(aAngle).Rotate(AngleCycle).KeepCloseTo(LastAngle, ref AngleCycle);
-
-                LastAngle = new Angle(Angle.Radians, Angle.Cycles);
-            }*/
 
             public Ray(int aTimestamp, Point aPoint, Point aCenter)
             {
@@ -138,14 +129,14 @@ namespace SmoothVolume
 
         #region Public methods
 
-        public Rotation(int aCenterX, int aCenterY, double aRadius, double aExpectedSpeed)
+        public RotationDetector(int aCenterX, int aCenterY, double aRadius, double aExpectedSpeed)
         {
             iCenter = new Point(aCenterX, aCenterY);
             iRadius = aRadius;
             iExpectedSpeed = aExpectedSpeed * Math.PI / 180;
             
-            Console.WriteLine("Radius: {0} [{1} - {2}]", iRadius, iRadius * (1.0 - RADIUS_ERROR_THRESHOLD), iRadius * (1.0 + RADIUS_ERROR_THRESHOLD));
-            Console.WriteLine("Expected speed: {0:N3} [{1:N3} - {2:N3}]", iExpectedSpeed, iExpectedSpeed * (1 - SPEED_ERROR_THRESHOLD), iExpectedSpeed * (1 + SPEED_ERROR_THRESHOLD));
+            //Console.WriteLine("Radius: {0} [{1} - {2}]", iRadius, iRadius * (1.0 - RADIUS_ERROR_THRESHOLD), iRadius * (1.0 + RADIUS_ERROR_THRESHOLD));
+            //Console.WriteLine("Expected speed: {0:N3} [{1:N3} - {2:N3}]", iExpectedSpeed, iExpectedSpeed * (1 - SPEED_ERROR_THRESHOLD), iExpectedSpeed * (1 + SPEED_ERROR_THRESHOLD));
         }
 
         public void invalidate()
@@ -171,7 +162,7 @@ namespace SmoothVolume
                         OnAngleChanged(this, new AngleChangedArgs(ANGLE_CHANGE));
                     else if (track.State == State.Decrease)
                         OnAngleChanged(this, new AngleChangedArgs(-ANGLE_CHANGE));
-                    Console.WriteLine("{0}\t\t|\t\t{1}", newRay, track);
+                    //Console.WriteLine("{0}\t\t|\t\t{1}", newRay, track);
                 }
                 else
                 {
