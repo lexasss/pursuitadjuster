@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ETUDriver;
+using Utils = GazeInSimSpace.Player;
 
 namespace SmoothVolume
 {
@@ -15,7 +16,7 @@ namespace SmoothVolume
     {
         private CoETUDriver iETUDriver;
         private GazeParser iParser;
-        private GazeInSimSpace.Player.Player iPlayer;
+        private Utils.Player iPlayer;
         private Knob iKnob;
 
         private TheCodeKing.ActiveButtons.Controls.IActiveMenu iMenu;
@@ -37,11 +38,14 @@ namespace SmoothVolume
             iKnob = new Knob(pcbKnob.Size);
             iKnob.OnValueChanged += OnValueChnaged;
             iKnob.OnRedraw += Knob_OnRedraw;
-                
-            iParser = new GazeParser(pcbKnob.Width / 2, pcbKnob.Height / 2, iKnob.TargetRadius, iKnob.TargetSpeed);
-            iParser.OnAngleChanged += (s, e) => { iKnob.Value += e.AngleChange; };
 
-            iPlayer = new GazeInSimSpace.Player.WavPlayer();
+            Rotation rotation = new Rotation(pcbKnob.Width / 2, pcbKnob.Height / 2, iKnob.TargetRadius, iKnob.TargetSpeed);
+            rotation.OnAngleChanged += (s, e) => { this.Invoke(new Action(() => { iKnob.Value += e.AngleChange; })); };
+
+            iParser = new GazeParser();
+            iParser.Control = rotation;
+
+            iPlayer = new Utils.WavPlayer();
             iPlayer.init();
             
             CreateMenu();
