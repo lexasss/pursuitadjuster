@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 namespace SmoothVolume
 {
-    public class HiResTimer
+    public class HiResTimestamp
     {
         private bool isPerfCounterSupported = false;
         private Int64 frequency = 0;
@@ -17,7 +17,7 @@ namespace SmoothVolume
         [DllImport(lib)]
         private static extern int QueryPerformanceFrequency(ref Int64 frequency);
 
-        public HiResTimer()
+        public HiResTimestamp()
         {
             // Query the high-resolution timer only if it is supported.
             // A returned frequency of 1000 typically indicates that it is not

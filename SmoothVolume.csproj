@@ -55,7 +55,7 @@
   <ItemGroup>
     <Compile Include="Angle.cs" />
     <Compile Include="GazeTarget.cs" />
-    <Compile Include="HiResTimer.cs" />
+    <Compile Include="HiResTimestamp.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -64,6 +64,7 @@
     </Compile>
     <Compile Include="GazeParser.cs" />
     <Compile Include="Knob.cs" />
+    <Compile Include="MicroLib.cs" />
     <Compile Include="Player\Declarations.cs" />
     <Compile Include="Player\Device.cs" />
     <Compile Include="Player\NAudioPlayer.cs" />

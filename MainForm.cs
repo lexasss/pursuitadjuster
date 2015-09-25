@@ -132,7 +132,8 @@ namespace SmoothVolume
 
         public void Knob_OnRedraw(object sender, EventArgs e)
         {
-            pcbKnob.Refresh();
+            //pcbKnob.Refresh();
+            pcbKnob.Invoke(new Action(pcbKnob.Refresh));
         }
 
         private void OnValueChnaged(object sender, Knob.ValueChangedArgs e)

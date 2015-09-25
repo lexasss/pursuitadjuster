@@ -9,20 +9,23 @@ namespace SmoothVolume
     {
         private const double RADIUS = 0.35;         // fraction of the min(width, height)
         private const double INITIAL_ANGLE = 90;    // degrees
-        private const int ACCELERATION_STEPS = 20;  // number of steps taken to speed up o the full spped and slow down to stop
+        private const int ACCELERATION_STEPS = 20;  // number of steps taken to speed up to the full speed and to slow down to stop
         private const int STEP_DURATION = 25;       // ms
 
         private readonly Point iCenter;
         private readonly double iRadius;
         private readonly double iSpeed;             // degrees per step
 
-        private System.Windows.Forms.Timer iTimer = new System.Windows.Forms.Timer();
         private int iStepCounter;
         private Angle iAngle;                       // degrees
+        private long iLocationX;
+        private long iLocationY;
 
         // improved timer
         private long iStartTimestamp = 0;
-        private HiResTimer iHRTimer = new HiResTimer();
+        private HiResTimestamp iHRTimestamp = new HiResTimestamp();
+        // private System.Windows.Forms.Timer iTimer = new System.Windows.Forms.Timer();
+        MicroLib.MicroTimer iTimer = new MicroLib.MicroTimer();
 
         public class LocationChangedArgs: EventArgs
         {
@@ -37,7 +40,20 @@ namespace SmoothVolume
         public event EventHandler OnVisibilityChanged = delegate { };
 
         public Bitmap Bitmap { get; private set; }
-        public Point Location { get; private set; }
+        public Point Location
+        {
+            get
+            {
+                return new Point(
+                    (int)System.Threading.Interlocked.Read(ref iLocationX),
+                    (int)System.Threading.Interlocked.Read(ref iLocationY));
+            }
+            private set
+            {
+                System.Threading.Interlocked.Exchange(ref iLocationX, value.X);
+                System.Threading.Interlocked.Exchange(ref iLocationY, value.Y);
+            }
+        }
 
         // Something funny is here:
         //      if STEP_DURATION = 25, then the expected number of steps per second is 40
@@ -70,7 +86,7 @@ namespace SmoothVolume
 
             iTimer.Start();
 
-            iStartTimestamp = iHRTimer.Milliseconds;
+            iStartTimestamp = iHRTimestamp.Milliseconds;
         }
 
         public void hide()
@@ -95,6 +111,7 @@ namespace SmoothVolume
         private void Timer_Tick(object aSender, EventArgs e)
         {
             iStepCounter++;
+
             if (iStepCounter == 0)
             {
                 iTimer.Stop();
@@ -104,6 +121,7 @@ namespace SmoothVolume
             }
             else
             {
+                long duration = iHRTimestamp.Milliseconds - iStartTimestamp;
                 double speed = iSpeed;
                 if (iStepCounter < ACCELERATION_STEPS)
                 {
@@ -112,14 +130,18 @@ namespace SmoothVolume
                 }
 
                 SetAngle(iAngle.Degrees + speed);
+                
+                //if (iSpeed > 0)
+                //    Console.WriteLine("{0}, {1}, {2}, {3}", iStepCounter, duration, speed, iAngle.Degrees);
             }
 
-            // Improving timer
+            // Improved timer
+            /*
             iTimer.Stop();
             if (iStepCounter > 0)
             {
-                long timestamp = iHRTimer.Milliseconds - iStartTimestamp;
-                int delay = Math.Max((int)(timestamp - iStepCounter * STEP_DURATION), 0);
+                long duration = iHRTimestamp.Milliseconds - iStartTimestamp;
+                int delay = Math.Max((int)(duration - iStepCounter * STEP_DURATION), 0);
                 iTimer.Interval = Math.Max(3, STEP_DURATION - delay);
             }
             else
@@ -128,6 +150,7 @@ namespace SmoothVolume
             }
 
             iTimer.Start();
+             */
         }
     }
 }
