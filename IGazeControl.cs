@@ -59,6 +59,11 @@ namespace SmoothVolume
         public abstract void stop();
         public abstract void draw(Graphics aGraphics);
 
+        public void reset()
+        {
+            Value = 128;
+        }
+
         #endregion
     }
 }

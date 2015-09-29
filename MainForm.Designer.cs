@@ -29,6 +29,9 @@
         private void InitializeComponent()
         {
             this.pcbControl = new System.Windows.Forms.PictureBox();
+            this.lblTargetColor = new System.Windows.Forms.Label();
+            this.lblColor = new System.Windows.Forms.Label();
+            this.sfdSaveData = new System.Windows.Forms.SaveFileDialog();
             ((System.ComponentModel.ISupportInitialize)(this.pcbControl)).BeginInit();
             this.SuspendLayout();
             // 
@@ -41,16 +44,45 @@
             this.pcbControl.TabStop = false;
             this.pcbControl.Paint += new System.Windows.Forms.PaintEventHandler(this.pcbControl_Paint);
             // 
+            // lblTargetColor
+            // 
+            this.lblTargetColor.BackColor = System.Drawing.Color.Red;
+            this.lblTargetColor.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lblTargetColor.Location = new System.Drawing.Point(202, 191);
+            this.lblTargetColor.Name = "lblTargetColor";
+            this.lblTargetColor.Size = new System.Drawing.Size(100, 50);
+            this.lblTargetColor.TabIndex = 1;
+            this.lblTargetColor.Text = "TARGET";
+            this.lblTargetColor.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // lblColor
+            // 
+            this.lblColor.BackColor = System.Drawing.Color.White;
+            this.lblColor.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lblColor.Location = new System.Drawing.Point(202, 256);
+            this.lblColor.Name = "lblColor";
+            this.lblColor.Size = new System.Drawing.Size(100, 50);
+            this.lblColor.TabIndex = 2;
+            this.lblColor.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // sfdSaveData
+            // 
+            this.sfdSaveData.DefaultExt = "txt";
+            this.sfdSaveData.Filter = "Text files|*.txt";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(503, 500);
+            this.Controls.Add(this.lblColor);
+            this.Controls.Add(this.lblTargetColor);
             this.Controls.Add(this.pcbControl);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "MainForm";
             this.Text = "Smooth Volume";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyDown);
             ((System.ComponentModel.ISupportInitialize)(this.pcbControl)).EndInit();
             this.ResumeLayout(false);
 
@@ -59,6 +91,9 @@
         #endregion
 
         private System.Windows.Forms.PictureBox pcbControl;
+        private System.Windows.Forms.Label lblTargetColor;
+        private System.Windows.Forms.Label lblColor;
+        private System.Windows.Forms.SaveFileDialog sfdSaveData;
     }
 }
 

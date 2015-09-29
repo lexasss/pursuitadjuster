@@ -27,7 +27,7 @@ namespace SmoothVolume
         //private HiResTimestamp iHRTimestamp = new HiResTimestamp();
         
         // improved timer
-        MicroLib.MicroTimer iTimer = new MicroLib.MicroTimer();
+        private MicroLib.MicroTimer iTimer = new MicroLib.MicroTimer();
 
         #endregion
 

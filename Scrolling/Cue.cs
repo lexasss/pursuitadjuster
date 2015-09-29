@@ -10,7 +10,7 @@ namespace SmoothVolume.Scrolling
     {
         #region Internal members
 
-        private double iAltitude;
+        private double iLattitude;
         private Point iInitialPosition;
         private Rectangle iPathRect;
 
@@ -36,7 +36,7 @@ namespace SmoothVolume.Scrolling
 
         protected override void SetInitialLocation()
         {
-            SetAltitude(iInitialPosition.Y);
+            SetLattitude(iInitialPosition.X);
         }
 
         protected override void UpdateLocation()
@@ -50,28 +50,28 @@ namespace SmoothVolume.Scrolling
             SlideBy(speed);
         }
 
-        private void SetAltitude(double aY)
+        private void SetLattitude(double aX)
         {
-            iAltitude = aY;
+            iLattitude = aX;
             Location = new Point(
-                (int)Math.Round((double)(iInitialPosition.X - iBitmapCenter.X)),
-                (int)Math.Round(iAltitude - iBitmapCenter.Y));
+                (int)Math.Round((double)(iLattitude - iBitmapCenter.X)),
+                (int)Math.Round(iInitialPosition.Y - iBitmapCenter.Y - 8)); // 8 - a hack to show the cue higher
         }
 
         private void SlideBy(double aDistance)
         {
-            double y = iAltitude + aDistance;
+            double x = iLattitude + aDistance;
 
-            if (y > iPathRect.Bottom)
+            if (x > iPathRect.Right)
             {
-                y = iPathRect.Top;
+                x = iPathRect.Left;
             }
-            if (y < iPathRect.Top)
+            if (x < iPathRect.Left)
             {
-                y = iPathRect.Bottom;
+                x = iPathRect.Right;
             }
 
-            SetAltitude(y);
+            SetLattitude(x);
         }
 
         #endregion

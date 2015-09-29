@@ -14,7 +14,7 @@ namespace SmoothVolume.Rotation
         private const float MIN_ANGLE = -135;           // degrees
         private const float MAX_ANGLE = 135;            // degrees
         private const double TARGET_SPEED = 1.4;        // degrees per step
-        private const double MAX_VALUE = 100;
+        private const double MAX_VALUE = 255;
         private const uint VOLUME_MIN = 1;
         private const uint VOLUME_MAX = 16;
         
@@ -22,7 +22,7 @@ namespace SmoothVolume.Rotation
 
         #region Internal members
 
-        private double iValue = 50;
+        private double iValue = -1;
         private Image iIndicator;
         private Point iIndicatorLocation;
 
@@ -75,6 +75,8 @@ namespace SmoothVolume.Rotation
 
             iIndicatorLocation = new Point(-iIndicator.Width / 2, -INDICATOR_OFFSET);
 
+            Value = (int)(MAX_VALUE / 2);
+            
             PursueDetector pd = new PursueDetector(iImage.Width / 2, iImage.Height / 2, iIncrease.Radius, iIncrease.Speed * Math.PI / 180);
             pd.OnValueChangeRequest += (s, e) => { Value += e.ValueChange; };
 

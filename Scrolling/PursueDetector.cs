@@ -53,7 +53,7 @@ namespace SmoothVolume.Scrolling
 
             protected override double GetLength()
             {
-                return Distance.Y;
+                return Distance.X;
             }
         }
 

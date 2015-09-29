@@ -18,6 +18,7 @@ namespace SmoothVolume
         private GazeParser iParser;
         private Utils.Player iPlayer;
         private IGazeControl iGazeControl;  // set only using SetGazeControl
+        private Experiment iExperiment;
 
         private Rotation.Knob iKnob;
         private Scrolling.Bar iScrollbar;
@@ -39,14 +40,19 @@ namespace SmoothVolume
             iETUDriver.OnCalibrated += ETUDriver_OnCalibrated;
             iETUDriver.OnDataEvent += ETUDriver_OnDataEvent;
 
+            iExperiment = new Experiment(3);
+            iExperiment.OnNextTrial += Experiment_OnNextTrial;
+            iExperiment.OnFinished += Experiment_OnFinished;
+
             CreateMenu();
 
             iKnob = new Rotation.Knob();
-            //iKnob.OnValueChanged += GazeControl_OnValueChnaged;
+            iKnob.OnValueChanged += GazeControl_OnValueChnaged;
             iKnob.OnSoundPlayRequest += GazeControl_OnSoundPlayRequest;
             iKnob.OnRedraw += GazeControl_OnRedraw;
 
             iScrollbar = new Scrolling.Bar();
+            iScrollbar.OnValueChanged += GazeControl_OnValueChnaged;
             iScrollbar.OnSoundPlayRequest += GazeControl_OnSoundPlayRequest;
             iScrollbar.OnRedraw += GazeControl_OnRedraw;
 
@@ -104,11 +110,13 @@ namespace SmoothVolume
                 if (iETUDriver.Active == 0)
                 {
                     //pcbControl.Show();
+                    iExperiment.start();
                     iETUDriver.startTracking();
                 }
                 else
                 {
                     iETUDriver.stopTracking();
+                    iExperiment.stop();
                     //pcbControl.Hide();
                 }
             };
@@ -165,9 +173,30 @@ namespace SmoothVolume
             }
         }
 
-        public void GazeControl_OnRedraw(object sender, EventArgs e)
+        private void Experiment_OnFinished(object sender, EventArgs e)
+        {
+            iETUDriver.stopTracking();
+            if (sfdSaveData.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                iExperiment.save(sfdSaveData.FileName);
+            }
+        }
+
+        private void Experiment_OnNextTrial(object aSender, Experiment.NextTrialArgs aArgs)
+        {
+            lblTargetColor.BackColor = aArgs.TargetColor;
+            lblColor.BackColor = aArgs.StartColor;
+            iGazeControl.reset();
+        }
+
+        private void GazeControl_OnRedraw(object sender, EventArgs e)
         {
             pcbControl.Invoke(new Action(pcbControl.Refresh));
+        }
+
+        private void GazeControl_OnValueChnaged(object aSender, IGazeControl.ValueChangedArgs aArgs)
+        {
+            this.Invoke(new Action(() => { lblColor.BackColor = iExperiment.CurrentTrial.createColor((int)aArgs.Current); }));
         }
 
         private void GazeControl_OnSoundPlayRequest(object sender, Rotation.Knob.SoundPlayRequestArgs e)
@@ -186,6 +215,14 @@ namespace SmoothVolume
             if (iETUDriver.Active != 0)
             {
                 e.Cancel = true;
+            }
+        }
+
+        private void MainForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Space)
+            {
+                iExperiment.next(lblColor.BackColor);
             }
         }
     }
