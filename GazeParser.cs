@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace SmoothVolume
+namespace SmoothPursuit
 {
     public class GazeParser
     {

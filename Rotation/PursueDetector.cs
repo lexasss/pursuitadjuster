@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 
-namespace SmoothVolume.Rotation
+namespace SmoothPursuit.Rotation
 {
     internal class PursueDetector : IPursueDetector
     {
@@ -48,8 +48,8 @@ namespace SmoothVolume.Rotation
             public Angle Angle { get; private set; }
             // Speed is in rad / sec
 
-            public GazeTrack(Ray aFirst, Ray aLast)
-                : base(aFirst, aLast)
+            public GazeTrack(Ray aFirst, Ray aLast, double aExpectedSpeed)
+                : base(aFirst, aLast, aExpectedSpeed)
             {
                 Angle = (aLast.Angle - aFirst.Angle).normalize();
             }
@@ -113,7 +113,7 @@ namespace SmoothVolume.Rotation
 
         protected override Track CreateTrack(DataPoint aFirstDataPoint, DataPoint aLastDataPoint)
         {
-            return new GazeTrack((Ray)aFirstDataPoint, (Ray)aLastDataPoint);
+            return new GazeTrack((Ray)aFirstDataPoint, (Ray)aLastDataPoint, iExpectedSpeed);
         }
 
         #endregion

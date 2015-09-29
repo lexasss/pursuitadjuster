@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 
-namespace SmoothVolume.Rotation
+namespace SmoothPursuit.Rotation
 {
     internal class Cue : ICue
     {

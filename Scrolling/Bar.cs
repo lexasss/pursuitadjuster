@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 
-namespace SmoothVolume.Scrolling
+namespace SmoothPursuit.Scrolling
 {
     public sealed class Bar : IGazeControl
     {
@@ -69,22 +69,23 @@ namespace SmoothVolume.Scrolling
 
         public Bar()
         {
-            iImage = global::SmoothVolume.Properties.Resources.scrollbar;
+            iImage = global::SmoothPursuit.Properties.Resources.scrollbar;
             Rectangle cuePath = new Rectangle(SLIDER_X, SLIDER_Y, SLIDER_WIDTH, SLIDER_HEIGHT);
 
-            iDecrease = new Cue(global::SmoothVolume.Properties.Resources.left, -TARGET_SPEED, cuePath);
+            iDecrease = new Cue(global::SmoothPursuit.Properties.Resources.left, -TARGET_SPEED, cuePath);
             iDecrease.OnVisibilityChanged += (s, e) => { OnRedraw(this, e); };
 
-            iIncrease = new Cue(global::SmoothVolume.Properties.Resources.right, TARGET_SPEED, cuePath);
+            iIncrease = new Cue(global::SmoothPursuit.Properties.Resources.right, TARGET_SPEED, cuePath);
             iIncrease.OnLocationChanged += (s, e) => { OnRedraw(this, e); };
             iIncrease.OnVisibilityChanged += (s, e) => { OnRedraw(this, e); };
 
-            iThumb = new Bitmap(global::SmoothVolume.Properties.Resources.thumb);
+            iThumb = new Bitmap(global::SmoothPursuit.Properties.Resources.thumb);
             iThumbLength = iThumb.Width;
 
             Value = (int)(MAX_VALUE / 2);
 
-            PursueDetector pd = new PursueDetector(new Rectangle(SLIDER_X, SLIDER_Y, SLIDER_WIDTH, SLIDER_HEIGHT), iIncrease.Speed);
+            //PursueDetector pd = new PursueDetector(new Rectangle(SLIDER_X, SLIDER_Y, SLIDER_WIDTH, SLIDER_HEIGHT), iIncrease.Speed);
+            OffsetPursueDetector pd = new OffsetPursueDetector(iIncrease, iDecrease);
             pd.OnValueChangeRequest += (s, e) => { Value += e.ValueChange; };
 
             iPursueDetector = pd;

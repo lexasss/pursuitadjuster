@@ -1,4 +1,4 @@
-﻿namespace SmoothVolume
+﻿namespace SmoothPursuit
 {
     partial class MainForm
     {

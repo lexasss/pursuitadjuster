@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
 
-namespace SmoothVolume
+namespace SmoothPursuit
 {
     public abstract class IPursueDetector
     {
@@ -28,20 +28,29 @@ namespace SmoothVolume
 
         protected abstract class Track
         {
+            public static double SPEED_ERROR_THRESHOLD = 0.4;   // fraction
+
+            protected double iExpectedSpeed;
+
+            private State State { get; set; }
             public int Duration { get; private set; }
             public double Speed { get { return GetLength() * 1000 / Duration; } }
-            public State State { get; set; }
 
-            public Track(DataPoint aFirst, DataPoint aLast)
+            public Track(DataPoint aFirst, DataPoint aLast, double aExpectedSpeed)
             {
+                iExpectedSpeed = aExpectedSpeed;
                 Duration = aLast.Timestamp - aFirst.Timestamp;
                 State = State.Unknown;
             }
 
-            public bool isSpeedInRange(double aMin, double aMax)
+            public virtual bool isFollowingIncreaseCue()
             {
-                var speed = this.Speed;
-                return aMin <= speed && speed <= aMax;
+                return IsMovingWithSpeed(iExpectedSpeed * (1 - SPEED_ERROR_THRESHOLD), iExpectedSpeed * (1 + SPEED_ERROR_THRESHOLD));
+            }
+
+            public virtual bool isFollowingDecreaseCue()
+            {
+                return IsMovingWithSpeed(-iExpectedSpeed * (1 + SPEED_ERROR_THRESHOLD), -iExpectedSpeed * (1 - SPEED_ERROR_THRESHOLD));
             }
 
             public override string ToString()
@@ -54,6 +63,12 @@ namespace SmoothVolume
             }
 
             protected abstract double GetLength();
+
+            protected bool IsMovingWithSpeed(double aMinSpeed, double aMaxSpeed)
+            {
+                var speed = this.Speed;
+                return aMinSpeed <= speed && speed <= aMaxSpeed;
+            }
         }
 
         #endregion
@@ -61,7 +76,6 @@ namespace SmoothVolume
         #region Consts
 
         protected int BUFFER_DURATION = 1000;           // ms
-        protected double SPEED_ERROR_THRESHOLD = 0.4;   // fraction
         protected double VALUE_CHANGE = 1;
         
         #endregion
@@ -94,7 +108,7 @@ namespace SmoothVolume
         public IPursueDetector(double aExpectedSpeed)
         {
             iExpectedSpeed = aExpectedSpeed;
-            //Console.WriteLine("Expected speed: {0:N3} [{1:N3} - {2:N3}]", iExpectedSpeed, iExpectedSpeed * (1 - SPEED_ERROR_THRESHOLD), iExpectedSpeed * (1 + SPEED_ERROR_THRESHOLD));
+            Console.WriteLine("Expected speed: {0:N3} [{1:N3} - {2:N3}]", iExpectedSpeed, iExpectedSpeed * (1 - Track.SPEED_ERROR_THRESHOLD), iExpectedSpeed * (1 + Track.SPEED_ERROR_THRESHOLD));
         }
 
         public virtual void start()
@@ -120,22 +134,23 @@ namespace SmoothVolume
 
                 if (iReady)
                 {
-                    Track track = ComputeTrack(newDataPoint);
+                    DataPoint firstDataPoint = iDataBuffer.Peek();
+                    Track track = CreateTrack(firstDataPoint, newDataPoint);
 
-                    if (track.State == State.Increase)
+                    if (track.isFollowingIncreaseCue())
                         OnValueChangeRequest(this, new ValueChangeRequestArgs(VALUE_CHANGE));
-                    else if (track.State == State.Decrease)
+                    else if (track.isFollowingDecreaseCue())
                         OnValueChangeRequest(this, new ValueChangeRequestArgs(-VALUE_CHANGE));
-                    //Console.WriteLine("{0}\t\t|\t\t{1}", newDataPoint, track);
+                    Console.WriteLine("{0}\t\t|\t\t{1}", newDataPoint, track);
                 }
                 else
                 {
-                    //Console.WriteLine("{0}", iDataBuffer.Count);
+                    Console.WriteLine("{0}", iDataBuffer.Count);
                 }
             }
             else
             {
-                //Console.WriteLine("{0}\t{1}", newDataPoint.Length, ToDegrees(newDataPoint.Angle));
+                Console.WriteLine("{0}", newDataPoint);
             }
         }
 
@@ -146,7 +161,7 @@ namespace SmoothVolume
         protected abstract DataPoint CreateDataPoint(int aTimestamp, Point aPoint);
         protected abstract Track CreateTrack(DataPoint aFirstDataPoint, DataPoint aLastDataPoint);
 
-        protected void LimitBuffer(int aTimestamp)
+        private void LimitBuffer(int aTimestamp)
         {
             while (iDataBuffer.Count > 0 && aTimestamp - iDataBuffer.Peek().Timestamp > BUFFER_DURATION)
             {
@@ -155,18 +170,6 @@ namespace SmoothVolume
             }
 
             iReady = iReady && iDataBuffer.Count > 1;
-        }
-
-        private Track ComputeTrack(DataPoint aLastDataPoint)
-        {
-            DataPoint firstDataPoint = iDataBuffer.Peek();
-            Track track = CreateTrack(firstDataPoint, aLastDataPoint);
-            if (track.isSpeedInRange(iExpectedSpeed * (1 - SPEED_ERROR_THRESHOLD), iExpectedSpeed * (1 + SPEED_ERROR_THRESHOLD)))
-                track.State = State.Increase;
-            else if (track.isSpeedInRange(-iExpectedSpeed * (1 + SPEED_ERROR_THRESHOLD), -iExpectedSpeed * (1 - SPEED_ERROR_THRESHOLD)))
-                track.State = State.Decrease;
-
-            return track;
         }
 
         #endregion

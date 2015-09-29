@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using System.Drawing;
 
-namespace SmoothVolume
+namespace SmoothPursuit
 {
     public class Experiment
     {

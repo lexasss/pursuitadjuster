@@ -4,32 +4,32 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 
-namespace SmoothPursuit.Scrolling
+namespace SmoothPursuit
 {
-    internal class PursueDetector : IPursueDetector
+    public class OffsetPursueDetector : IPursueDetector
     {
         #region Declarations
 
         private class GazePoint : DataPoint
         {
             public Point Location { get; private set; }
+            public Point Offset1 { get; private set; }
+            public Point Offset2 { get; private set; }
 
-            public GazePoint(int aTimestamp, Point aLocation)
+            public GazePoint(int aTimestamp, Point aLocation, Point aOffset1, Point aOffset2)
                 : base(aTimestamp)
             {
                 Location = aLocation;
-            }
-
-            public bool isOnSlide(Rectangle aRect)
-            {
-                return aRect.Contains(Location);
+                Offset1 = aOffset1;
+                Offset2 = aOffset2;
             }
 
             public override string ToString()
             {
                 return new StringBuilder().
-                    AppendFormat("\t{0}", Location.X).
-                    AppendFormat("\t{0}", Location.Y).
+                    AppendFormat("\t{0},{1}", Location.X, Location.Y).
+                    AppendFormat("\t{0},{1}", Offset1.X, Offset1.Y).
+                    AppendFormat("\t{0},{1}", Offset2.X, Offset2.Y).
                     ToString();
             }
         }
@@ -42,6 +42,14 @@ namespace SmoothPursuit.Scrolling
                 : base(aFirst, aLast, aExpectedSpeed)
             {
                 Distance = new Point(aLast.Location.X - aFirst.Location.X, aLast.Location.Y - aFirst.Location.Y);
+            }
+
+            public virtual bool isSpeedInRange(double aMin, double aMax)
+            {
+                if (aMax > 0)   // 
+                {
+                }
+                return true;
             }
 
             public override string ToString()
@@ -67,18 +75,18 @@ namespace SmoothPursuit.Scrolling
 
         #region Internal members
 
-        private Rectangle iSlideRect;
+        private ICue iCue1;
+        private ICue iCue2;
 
         #endregion
 
         #region Public methods
 
-        public PursueDetector(Rectangle aSlideRect, double aExpectedSpeed)  // aExpectedSpeed = pixels / sec
-            : base(aExpectedSpeed)
+        public OffsetPursueDetector(ICue aCue1, ICue aCue2)
+            : base(1)
         {
-            iSlideRect = aSlideRect;
-            iSlideRect.Inflate(MAPPING_PRECISION, MAPPING_PRECISION);
-
+            iCue1 = aCue1;
+            iCue2 = aCue2;
             VALUE_CHANGE = 1;
         }
 
@@ -88,13 +96,11 @@ namespace SmoothPursuit.Scrolling
 
         protected override DataPoint CreateDataPoint(int aTimestamp, Point aPoint)
         {
-            GazePoint newDataPoint = new GazePoint(aTimestamp, aPoint);
-            if (newDataPoint.isOnSlide(iSlideRect))
-            {
-                return newDataPoint;
-            }
-
-            return null;
+            Point cue1 = iCue1.Location;
+            Point cue2 = iCue2.Location;
+            return new GazePoint(aTimestamp, aPoint,
+                new Point(aPoint.X - cue1.X, aPoint.Y - cue1.Y),
+                new Point(aPoint.X - cue2.X, aPoint.Y - cue2.Y));
         }
 
         protected override Track CreateTrack(DataPoint aFirstDataPoint, DataPoint aLastDataPoint)

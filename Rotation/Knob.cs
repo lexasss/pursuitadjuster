@@ -4,7 +4,7 @@ using System.Windows.Forms;
 using System.Text;
 using System.Drawing;
 
-namespace SmoothVolume.Rotation
+namespace SmoothPursuit.Rotation
 {
     public sealed class Knob : IGazeControl
     {
@@ -62,16 +62,16 @@ namespace SmoothVolume.Rotation
 
         public Knob()
         {
-            iImage = global::SmoothVolume.Properties.Resources.knob;
+            iImage = global::SmoothPursuit.Properties.Resources.knob;
 
-            iIncrease = new Cue(global::SmoothVolume.Properties.Resources.increase, TARGET_SPEED, iImage.Size);
+            iIncrease = new Cue(global::SmoothPursuit.Properties.Resources.increase, TARGET_SPEED, iImage.Size);
             iIncrease.OnVisibilityChanged += (s, e) => { OnRedraw(this, e); };
 
-            iDecrease = new Cue(global::SmoothVolume.Properties.Resources.decrease, -TARGET_SPEED, iImage.Size);
+            iDecrease = new Cue(global::SmoothPursuit.Properties.Resources.decrease, -TARGET_SPEED, iImage.Size);
             iDecrease.OnLocationChanged += (s, e) => { OnRedraw(this, e); };
             iDecrease.OnVisibilityChanged += (s, e) => { OnRedraw(this, e); };
 
-            iIndicator = new Bitmap(global::SmoothVolume.Properties.Resources.indicator);
+            iIndicator = new Bitmap(global::SmoothPursuit.Properties.Resources.indicator);
 
             iIndicatorLocation = new Point(-iIndicator.Width / 2, -INDICATOR_OFFSET);
 

@@ -7,8 +7,8 @@
     <ProjectGuid>{006699BC-C16E-47A0-A450-99784D788C62}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SmoothVolume</RootNamespace>
-    <AssemblyName>SmoothVolume</AssemblyName>
+    <RootNamespace>SmoothPursuit</RootNamespace>
+    <AssemblyName>SmoothPursuitControl</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="Experiment.cs" />
     <Compile Include="ICue.cs" />
+    <Compile Include="OffsetPursueDetector.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

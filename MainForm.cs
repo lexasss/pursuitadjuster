@@ -10,7 +10,7 @@ using System.Windows.Forms;
 using ETUDriver;
 using Utils = GazeInSimSpace.Player;
 
-namespace SmoothVolume
+namespace SmoothPursuit
 {
     public partial class MainForm : Form
     {

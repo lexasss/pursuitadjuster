@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SmoothVolume.Rotation
+namespace SmoothPursuit.Rotation
 {
     public class Angle
     {
