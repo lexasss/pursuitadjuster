@@ -24,8 +24,8 @@ namespace SmoothPursuit
         #region Consts
 
         private const double MIN_FIX_DIST = 50;      // pixels
-        private const int OFFSET_X = 150;
-        private const int OFFSET_Y = 100;
+        private const int OFFSET_X = 0; //150;
+        private const int OFFSET_Y = 0; //100;
 
         #endregion
 

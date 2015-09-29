@@ -45,12 +45,22 @@ namespace SmoothPursuit
 
             public virtual bool isFollowingIncreaseCue()
             {
-                return IsMovingWithSpeed(iExpectedSpeed * (1 - SPEED_ERROR_THRESHOLD), iExpectedSpeed * (1 + SPEED_ERROR_THRESHOLD));
+                if (IsMovingWithSpeed(iExpectedSpeed * (1 - SPEED_ERROR_THRESHOLD), iExpectedSpeed * (1 + SPEED_ERROR_THRESHOLD)))
+                {
+                    State = State.Increase;
+                }
+
+                return State == State.Increase;
             }
 
             public virtual bool isFollowingDecreaseCue()
             {
-                return IsMovingWithSpeed(-iExpectedSpeed * (1 + SPEED_ERROR_THRESHOLD), -iExpectedSpeed * (1 - SPEED_ERROR_THRESHOLD));
+                if (IsMovingWithSpeed(-iExpectedSpeed * (1 + SPEED_ERROR_THRESHOLD), -iExpectedSpeed * (1 - SPEED_ERROR_THRESHOLD)))
+                {
+                    State = State.Decrease;
+                }
+
+                return State == State.Decrease;
             }
 
             public override string ToString()
@@ -108,7 +118,6 @@ namespace SmoothPursuit
         public IPursueDetector(double aExpectedSpeed)
         {
             iExpectedSpeed = aExpectedSpeed;
-            Console.WriteLine("Expected speed: {0:N3} [{1:N3} - {2:N3}]", iExpectedSpeed, iExpectedSpeed * (1 - Track.SPEED_ERROR_THRESHOLD), iExpectedSpeed * (1 + Track.SPEED_ERROR_THRESHOLD));
         }
 
         public virtual void start()
@@ -141,16 +150,16 @@ namespace SmoothPursuit
                         OnValueChangeRequest(this, new ValueChangeRequestArgs(VALUE_CHANGE));
                     else if (track.isFollowingDecreaseCue())
                         OnValueChangeRequest(this, new ValueChangeRequestArgs(-VALUE_CHANGE));
-                    Console.WriteLine("{0}\t\t|\t\t{1}", newDataPoint, track);
+                    //Console.WriteLine("{0}\t\t|\t\t{1}", newDataPoint, track);
                 }
                 else
                 {
-                    Console.WriteLine("{0}", iDataBuffer.Count);
+                    //Console.WriteLine("{0}", iDataBuffer.Count);
                 }
             }
             else
             {
-                Console.WriteLine("{0}", newDataPoint);
+                //Console.WriteLine("{0}", newDataPoint);
             }
         }
 

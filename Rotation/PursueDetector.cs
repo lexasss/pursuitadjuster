@@ -79,7 +79,6 @@ namespace SmoothPursuit.Rotation
 
         private Point iCenter;
         private double iRadius;             // pixels
-        private double iExpectedSpeed;      
 
         #endregion 
 
