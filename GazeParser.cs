@@ -24,6 +24,8 @@ namespace SmoothVolume
         #region Consts
 
         private const double MIN_FIX_DIST = 50;      // pixels
+        private const int OFFSET_X = 150;
+        private const int OFFSET_Y = 100;
 
         #endregion
 
@@ -68,9 +70,10 @@ namespace SmoothVolume
 
         public void feed(int aTimestamp, Point aPoint)
         {
+            Point gazePoint = new Point(aPoint.X + OFFSET_X, aPoint.Y + OFFSET_Y);
             lock (iPointBuffer)
             {
-                iPointBuffer.Enqueue(new GazePoint(aTimestamp, aPoint));
+                iPointBuffer.Enqueue(new GazePoint(aTimestamp, gazePoint));
             }
         }
 
