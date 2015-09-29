@@ -17,14 +17,16 @@ namespace SmoothVolume
         private CoETUDriver iETUDriver;
         private GazeParser iParser;
         private Utils.Player iPlayer;
-        private IGazeControl iGazeControl;
+        private IGazeControl iGazeControl;  // set only using SetGazeControl
 
         private Rotation.Knob iKnob;
+        private Scrolling.Bar iScrollbar;
 
         private TheCodeKing.ActiveButtons.Controls.IActiveMenu iMenu;
         private TheCodeKing.ActiveButtons.Controls.ActiveButton mbnOptions;
         private TheCodeKing.ActiveButtons.Controls.ActiveButton mbnCalibrate;
-        private TheCodeKing.ActiveButtons.Controls.ActiveButton mbnToggle;
+        private TheCodeKing.ActiveButtons.Controls.ActiveButton mbnToggleTracking;
+        private TheCodeKing.ActiveButtons.Controls.ActiveButton mbnToggleStimuli;
 
         public MainForm()
         {
@@ -37,29 +39,42 @@ namespace SmoothVolume
             iETUDriver.OnCalibrated += ETUDriver_OnCalibrated;
             iETUDriver.OnDataEvent += ETUDriver_OnDataEvent;
 
+            CreateMenu();
+
             iKnob = new Rotation.Knob();
-            //iKnob.OnValueChanged += Knob_OnValueChnaged;
-            iKnob.OnSoundPlayRequest += Knob_OnSoundPlayRequest;
-            iKnob.OnRedraw += Knob_OnRedraw;
+            //iKnob.OnValueChanged += GazeControl_OnValueChnaged;
+            iKnob.OnSoundPlayRequest += GazeControl_OnSoundPlayRequest;
+            iKnob.OnRedraw += GazeControl_OnRedraw;
+
+            iScrollbar = new Scrolling.Bar();
+            iScrollbar.OnSoundPlayRequest += GazeControl_OnSoundPlayRequest;
+            iScrollbar.OnRedraw += GazeControl_OnRedraw;
 
             iParser = new GazeParser();
 
-            iGazeControl = iKnob;
-            iParser.PursueDetector = iGazeControl.PursueDetector;
-            pcbControl.Image = iGazeControl.Image;
+            SetGazeControl(iKnob);
 
             iPlayer = new Utils.WavPlayer();
             iPlayer.init();
             
-            CreateMenu();
             EnabledMenuButtons();
+        }
+
+        private void SetGazeControl(IGazeControl aGazeControl)
+        {
+            iGazeControl = aGazeControl;
+            iParser.PursueDetector = iGazeControl.PursueDetector;
+            pcbControl.Image = iGazeControl.Image;
+
+            mbnToggleStimuli.Text = iGazeControl is Rotation.Knob ? "Switch to SCROLLBAR"  : "Switch to KNOB";
         }
 
         private void EnabledMenuButtons()
         {
             mbnOptions.Enabled = iETUDriver.DeviceCount > 0 && iETUDriver.Active == 0;
             mbnCalibrate.Enabled = iETUDriver.Ready != 0 && iETUDriver.Active == 0;
-            mbnToggle.Enabled = iETUDriver.Ready != 0 && iETUDriver.Calibrated != 0;
+            mbnToggleTracking.Enabled = iETUDriver.Ready != 0 && iETUDriver.Calibrated != 0;
+            mbnToggleStimuli.Enabled = iETUDriver.Active == 0;
         }
 
         private void CreateMenu()
@@ -82,23 +97,30 @@ namespace SmoothVolume
                 iETUDriver.calibrate();
             };
 
-            mbnToggle = new TheCodeKing.ActiveButtons.Controls.ActiveButton();
-            mbnToggle.Text = "Start";
-            mbnToggle.Click += (s, e) =>
+            mbnToggleTracking = new TheCodeKing.ActiveButtons.Controls.ActiveButton();
+            mbnToggleTracking.Text = "Start";
+            mbnToggleTracking.Click += (s, e) =>
             {
                 if (iETUDriver.Active == 0)
                 {
-                    pcbControl.Show();
+                    //pcbControl.Show();
                     iETUDriver.startTracking();
                 }
                 else
                 {
                     iETUDriver.stopTracking();
-                    pcbControl.Hide();
+                    //pcbControl.Hide();
                 }
             };
 
-            iMenu.Items.Add(mbnToggle);
+            mbnToggleStimuli = new TheCodeKing.ActiveButtons.Controls.ActiveButton();
+            mbnToggleStimuli.Click += (s, e) =>
+            {
+                SetGazeControl(iGazeControl is Rotation.Knob ? (IGazeControl)iScrollbar : (IGazeControl)iKnob);
+            };
+
+            iMenu.Items.Add(mbnToggleStimuli);
+            iMenu.Items.Add(mbnToggleTracking);
             iMenu.Items.Add(mbnCalibrate);
             iMenu.Items.Add(mbnOptions);
         }
@@ -121,13 +143,13 @@ namespace SmoothVolume
             iETUDriver.set_Offset(ref offset);
             
             EnabledMenuButtons();
-            mbnToggle.Text = "Stop";
+            mbnToggleTracking.Text = "Stop";
         }
 
         private void ETUDriver_OnRecordingStop()
         {
             EnabledMenuButtons();
-            mbnToggle.Text = "Start";
+            mbnToggleTracking.Text = "Start";
 
             iParser.stop();
             iGazeControl.stop();
@@ -143,12 +165,12 @@ namespace SmoothVolume
             }
         }
 
-        public void Knob_OnRedraw(object sender, EventArgs e)
+        public void GazeControl_OnRedraw(object sender, EventArgs e)
         {
             pcbControl.Invoke(new Action(pcbControl.Refresh));
         }
 
-        private void Knob_OnSoundPlayRequest(object sender, Rotation.Knob.SoundPlayRequestArgs e)
+        private void GazeControl_OnSoundPlayRequest(object sender, Rotation.Knob.SoundPlayRequestArgs e)
         {
             iPlayer.setVolume(0, e.Volume, e.Volume);
             iPlayer.play("sounds\\click.wav", "", 0);
@@ -157,6 +179,14 @@ namespace SmoothVolume
         private void pcbControl_Paint(object sender, PaintEventArgs e)
         {
             iGazeControl.draw(e.Graphics);
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (iETUDriver.Active != 0)
+            {
+                e.Cancel = true;
+            }
         }
     }
 }

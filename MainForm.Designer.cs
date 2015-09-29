@@ -39,7 +39,6 @@
             this.pcbControl.Size = new System.Drawing.Size(500, 500);
             this.pcbControl.TabIndex = 0;
             this.pcbControl.TabStop = false;
-            this.pcbControl.Visible = false;
             this.pcbControl.Paint += new System.Windows.Forms.PaintEventHandler(this.pcbControl_Paint);
             // 
             // MainForm
@@ -51,6 +50,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "MainForm";
             this.Text = "Smooth Volume";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.pcbControl)).EndInit();
             this.ResumeLayout(false);
 

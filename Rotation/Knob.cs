@@ -15,15 +15,14 @@ namespace SmoothVolume.Rotation
         private const float MAX_ANGLE = 135;            // degrees
         private const double TARGET_SPEED = 1.4;        // degrees per step
         private const double MAX_VALUE = 100;
+        private const uint VOLUME_MIN = 1;
+        private const uint VOLUME_MAX = 16;
         
-        private readonly int iIndicatorWidth;
-        private readonly int iIndicatorHeight;
-
         #endregion
 
         #region Internal members
 
-        private double iValue;
+        private double iValue = 50;
         private Image iIndicator;
         private Point iIndicatorLocation;
 
@@ -63,25 +62,21 @@ namespace SmoothVolume.Rotation
 
         public Knob()
         {
-            Value = 50;
-
             iImage = global::SmoothVolume.Properties.Resources.knob;
 
-            iIncrease = new Cue(global::SmoothVolume.Properties.Resources.increase, iImage.Size, TARGET_SPEED);
+            iIncrease = new Cue(global::SmoothVolume.Properties.Resources.increase, TARGET_SPEED, iImage.Size);
             iIncrease.OnVisibilityChanged += (s, e) => { OnRedraw(this, e); };
 
-            iDecrease = new Cue(global::SmoothVolume.Properties.Resources.decrease, iImage.Size, -TARGET_SPEED);
+            iDecrease = new Cue(global::SmoothVolume.Properties.Resources.decrease, -TARGET_SPEED, iImage.Size);
             iDecrease.OnLocationChanged += (s, e) => { OnRedraw(this, e); };
             iDecrease.OnVisibilityChanged += (s, e) => { OnRedraw(this, e); };
 
             iIndicator = new Bitmap(global::SmoothVolume.Properties.Resources.indicator);
-            iIndicatorWidth = iIndicator.Width;
-            iIndicatorHeight = iIndicator.Height;
 
-            iIndicatorLocation = new Point(-iIndicatorWidth / 2, -INDICATOR_OFFSET);
+            iIndicatorLocation = new Point(-iIndicator.Width / 2, -INDICATOR_OFFSET);
 
-            PursueDetector pd = new PursueDetector(iImage.Width / 2, iImage.Height / 2, iIncrease.Radius, iIncrease.Speed);
-            pd.OnAngleChanged += (s, e) => { Value += e.AngleChange; };
+            PursueDetector pd = new PursueDetector(iImage.Width / 2, iImage.Height / 2, iIncrease.Radius, iIncrease.Speed * Math.PI / 180);
+            pd.OnValueChangeRequest += (s, e) => { Value += e.ValueChange; };
 
             iPursueDetector = pd;
         }
@@ -118,7 +113,7 @@ namespace SmoothVolume.Rotation
         {
             if ((int)(aPrevValue / 3) != (int)(iValue / 3))
             {
-                uint volume = 1 + (uint)Math.Round(15 * iValue / MAX_VALUE);
+                uint volume = VOLUME_MIN + (uint)Math.Round((VOLUME_MAX - VOLUME_MIN) * iValue / MAX_VALUE);
                 OnSoundPlayRequest(this, new SoundPlayRequestArgs(volume));
             }
         }
