@@ -12,7 +12,7 @@ namespace SmoothPursuit.Scrolling
         private const uint VOLUME = 8;          // 1..16
 
         private const int SLIDER_X = 44;
-        private const int SLIDER_Y = 447;
+        private const int SLIDER_Y = 441;
         private const int SLIDER_WIDTH = 411;
         private const int SLIDER_HEIGHT = 36;
 
