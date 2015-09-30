@@ -77,7 +77,8 @@ namespace SmoothPursuit.Rotation
 
             Value = (int)(MAX_VALUE / 2);
 
-            PursueDetector pd = new PursueDetector(iImage.Width / 2, iImage.Height / 2, iIncrease.Radius, iIncrease.Speed * Math.PI / 180);
+            //PursueDetector pd = new PursueDetector(iImage.Width / 2, iImage.Height / 2, iIncrease.Radius, iIncrease.Speed * Math.PI / 180);
+            OffsetPursueDetector pd = new OffsetPursueDetector(iIncrease, iDecrease);
             pd.OnValueChangeRequest += (s, e) => { Value += e.ValueChange; };
 
             iPursueDetector = pd;

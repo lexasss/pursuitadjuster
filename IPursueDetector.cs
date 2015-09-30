@@ -32,7 +32,7 @@ namespace SmoothPursuit
 
             protected double iExpectedSpeed;
 
-            private State State { get; set; }
+            public State State { get; protected set; }
             public int Duration { get; private set; }
             public double Speed { get { return GetLength() * 1000 / Duration; } }
 
@@ -150,7 +150,7 @@ namespace SmoothPursuit
                         OnValueChangeRequest(this, new ValueChangeRequestArgs(VALUE_CHANGE));
                     else if (track.isFollowingDecreaseCue())
                         OnValueChangeRequest(this, new ValueChangeRequestArgs(-VALUE_CHANGE));
-                    //Console.WriteLine("{0}\t\t|\t\t{1}", newDataPoint, track);
+                    Console.WriteLine("{0}\t\t|\t\t{1}", newDataPoint, track);
                 }
                 else
                 {
