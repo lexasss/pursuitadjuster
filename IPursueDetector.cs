@@ -149,6 +149,7 @@ namespace SmoothPursuit
         {
             iReady = false;
             iDataBuffer.Clear();
+            Console.WriteLine("=== SACCADE === ");
         }
 
         public virtual void addGazePoint(int aTimestamp, Point aPoint)
@@ -169,7 +170,7 @@ namespace SmoothPursuit
                         OnValueChangeRequest(this, new ValueChangeRequestArgs(iValueStep));
                     else if (track.isFollowingDecreaseCue())
                         OnValueChangeRequest(this, new ValueChangeRequestArgs(-iValueStep));
-                    Console.WriteLine("{0}\t\t|\t\t{1}", newDataPoint, track);
+                    //Console.WriteLine("{0}\t\t|\t\t{1}", newDataPoint, track);
                 }
                 else
                 {
@@ -178,7 +179,7 @@ namespace SmoothPursuit
             }
             else
             {
-                //Console.WriteLine("{0}", newDataPoint);
+                //Console.WriteLine("{0}", aPoint);
             }
         }
 

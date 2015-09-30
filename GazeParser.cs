@@ -23,6 +23,7 @@ namespace SmoothPursuit
 
         #region Consts
 
+        private const float ALPHA = 0.2f;
         private const double MIN_FIX_DIST = 50;      // pixels
         private const int OFFSET_X = 0; //150;
         private const int OFFSET_Y = 0; //100;
@@ -31,7 +32,7 @@ namespace SmoothPursuit
 
         #region Internal members
 
-        private Point iLastPoint = Point.Empty;
+        private PointF iLastPoint = PointF.Empty;
 
         private Queue<GazePoint> iPointBuffer = new Queue<GazePoint>();
         private System.Windows.Forms.Timer iPointsTimer = new System.Windows.Forms.Timer();
@@ -54,6 +55,8 @@ namespace SmoothPursuit
 
         public void start()
         {
+            iLastPoint = PointF.Empty;
+
             if (PursueDetector != null)
             {
                 PursueDetector.start();
@@ -83,18 +86,25 @@ namespace SmoothPursuit
 
         private void EnsureSmoothPursuit(Point aPoint)
         {
+            PointF smoothedPoint = new PointF(aPoint.X, aPoint.Y);
             if (!iLastPoint.IsEmpty && PursueDetector != null)
             {
-                int dx = aPoint.X - iLastPoint.X;
-                int dy = aPoint.Y - iLastPoint.Y;
-                double dist = Math.Sqrt(dx * dx + dy * dy);
-                if (dist > MIN_FIX_DIST)
+                smoothedPoint = new PointF(
+                    (aPoint.X + ALPHA * iLastPoint.X) / (1.0f + ALPHA),
+                    (aPoint.Y + ALPHA * iLastPoint.Y) / (1.0f + ALPHA)
+                );
+
+                double dx = smoothedPoint.X - iLastPoint.X;
+                double dy = smoothedPoint.Y - iLastPoint.Y;
+                double distance = Math.Sqrt(dx * dx + dy * dy);
+                Console.WriteLine("{0:N0}", distance);
+                if (distance > MIN_FIX_DIST)
                 {
                     PursueDetector.saccade();
                 }
             }
 
-            iLastPoint = aPoint;
+            iLastPoint = smoothedPoint;
         }
 
         private void ProcessNewPoint(int aTimestamp, Point aPoint)
