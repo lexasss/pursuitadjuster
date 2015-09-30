@@ -28,22 +28,49 @@ namespace SmoothPursuit
 
         protected abstract class Track
         {
-            public static double SPEED_ERROR_THRESHOLD = 0.4;   // fraction
-
-            protected double iExpectedSpeed;
-
             public State State { get; protected set; }
             public int Duration { get; private set; }
-            public double Speed { get { return GetLength() * 1000 / Duration; } }
 
-            public Track(DataPoint aFirst, DataPoint aLast, double aExpectedSpeed)
+            public Track(DataPoint aFirst, DataPoint aLast)
             {
-                iExpectedSpeed = aExpectedSpeed;
                 Duration = aLast.Timestamp - aFirst.Timestamp;
                 State = State.Unknown;
             }
 
             public virtual bool isFollowingIncreaseCue()
+            {
+                return State == State.Increase;
+            }
+
+            public virtual bool isFollowingDecreaseCue()
+            {
+                return State == State.Decrease;
+            }
+
+            public override string ToString()
+            {
+                return new StringBuilder().
+                    AppendFormat("\t{0,12}", Duration).
+                    AppendFormat("\t{0}", State).
+                    ToString();
+            }
+        }
+
+        protected abstract class SpeedTrack : Track
+        {
+            public const double SPEED_ERROR_THRESHOLD = 0.4;   // fraction
+
+            protected double iExpectedSpeed;
+            
+            public double Speed { get { return GetLength() * 1000 / Duration; } }   // per second
+
+            public SpeedTrack(DataPoint aFirst, DataPoint aLast, double aExpectedSpeed)
+                : base(aFirst, aLast)
+            {
+                iExpectedSpeed = aExpectedSpeed;
+            }
+
+            public override bool isFollowingIncreaseCue()
             {
                 if (IsMovingWithSpeed(iExpectedSpeed * (1 - SPEED_ERROR_THRESHOLD), iExpectedSpeed * (1 + SPEED_ERROR_THRESHOLD)))
                 {
@@ -53,7 +80,7 @@ namespace SmoothPursuit
                 return State == State.Increase;
             }
 
-            public virtual bool isFollowingDecreaseCue()
+            public override bool isFollowingDecreaseCue()
             {
                 if (IsMovingWithSpeed(-iExpectedSpeed * (1 + SPEED_ERROR_THRESHOLD), -iExpectedSpeed * (1 - SPEED_ERROR_THRESHOLD)))
                 {
@@ -65,10 +92,8 @@ namespace SmoothPursuit
 
             public override string ToString()
             {
-                return new StringBuilder().
-                    AppendFormat("\t{0,12}", Duration).
+                return new StringBuilder(base.ToString()).
                     AppendFormat("\t{0,8:N3}", Speed).
-                    AppendFormat("\t{0}", State).
                     ToString();
             }
 
@@ -85,8 +110,7 @@ namespace SmoothPursuit
 
         #region Consts
 
-        protected int BUFFER_DURATION = 1000;           // ms
-        protected double VALUE_CHANGE = 1;
+        protected const int BUFFER_DURATION = 1000;           // ms
         
         #endregion
 
@@ -94,7 +118,7 @@ namespace SmoothPursuit
 
         protected Queue<DataPoint> iDataBuffer = new Queue<DataPoint>();
         protected bool iReady = false;
-        protected double iExpectedSpeed;      
+        protected double iValueStep = 1;
 
         #endregion
 
@@ -114,11 +138,6 @@ namespace SmoothPursuit
         #endregion
 
         #region Public methods
-
-        public IPursueDetector(double aExpectedSpeed)
-        {
-            iExpectedSpeed = aExpectedSpeed;
-        }
 
         public virtual void start()
         {
@@ -147,10 +166,10 @@ namespace SmoothPursuit
                     Track track = CreateTrack(firstDataPoint, newDataPoint);
 
                     if (track.isFollowingIncreaseCue())
-                        OnValueChangeRequest(this, new ValueChangeRequestArgs(VALUE_CHANGE));
+                        OnValueChangeRequest(this, new ValueChangeRequestArgs(iValueStep));
                     else if (track.isFollowingDecreaseCue())
-                        OnValueChangeRequest(this, new ValueChangeRequestArgs(-VALUE_CHANGE));
-                    Console.WriteLine("{0}\t\t|\t\t{1}", newDataPoint, track);
+                        OnValueChangeRequest(this, new ValueChangeRequestArgs(-iValueStep));
+                    //Console.WriteLine("{0}\t\t|\t\t{1}", newDataPoint, track);
                 }
                 else
                 {

@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using ETUDriver;
 using Utils = GazeInSimSpace.Player;
@@ -14,6 +8,16 @@ namespace SmoothPursuit
 {
     public partial class MainForm : Form
     {
+        #region Consts
+
+        private const bool COLOR_VALUE_VISIBLE = false;
+        private const bool SOUND_ENABLED = false;
+        private const bool CONTROL_ARE_INVISIBLE_WHEN_NOT_TRACKING = false;
+
+        #endregion
+
+        #region Internal members
+
         private CoETUDriver iETUDriver;
         private GazeParser iParser;
         private Utils.Player iPlayer;
@@ -28,6 +32,10 @@ namespace SmoothPursuit
         private TheCodeKing.ActiveButtons.Controls.ActiveButton mbnCalibrate;
         private TheCodeKing.ActiveButtons.Controls.ActiveButton mbnToggleTracking;
         private TheCodeKing.ActiveButtons.Controls.ActiveButton mbnToggleStimuli;
+
+        #endregion
+
+        #region Public methods
 
         public MainForm()
         {
@@ -66,11 +74,17 @@ namespace SmoothPursuit
             EnabledMenuButtons();
         }
 
+        #endregion
+
+        #region Internal methods
+
         private void SetGazeControl(IGazeControl aGazeControl)
         {
             iGazeControl = aGazeControl;
             iParser.PursueDetector = iGazeControl.PursueDetector;
+            
             pcbControl.Image = iGazeControl.Image;
+            pcbControl.Visible = !CONTROL_ARE_INVISIBLE_WHEN_NOT_TRACKING;
 
             mbnToggleStimuli.Text = iGazeControl is Rotation.Knob ? "Switch to SCROLLBAR"  : "Switch to KNOB";
         }
@@ -109,7 +123,7 @@ namespace SmoothPursuit
             {
                 if (iETUDriver.Active == 0)
                 {
-                    //pcbControl.Show();
+                    pcbControl.Visible = true;
                     iExperiment.start();
                     iETUDriver.startTracking();
                 }
@@ -117,7 +131,7 @@ namespace SmoothPursuit
                 {
                     iETUDriver.stopTracking();
                     iExperiment.stop();
-                    //pcbControl.Hide();
+                    pcbControl.Visible = !CONTROL_ARE_INVISIBLE_WHEN_NOT_TRACKING;
                 }
             };
 
@@ -132,6 +146,20 @@ namespace SmoothPursuit
             iMenu.Items.Add(mbnCalibrate);
             iMenu.Items.Add(mbnOptions);
         }
+
+        private void ConfigLabel(Label aLabel, Color aColor, int aValue)
+        {
+            aLabel.BackColor = aColor;
+            if (COLOR_VALUE_VISIBLE)
+            {
+                aLabel.Text = aValue.ToString();
+                aLabel.ForeColor = aValue > 140 ? Color.Black : Color.White;
+            }
+        }
+
+        #endregion
+
+        #region Event handlers
 
         private void ETUDriver_OnCalibrated()
         {
@@ -184,8 +212,8 @@ namespace SmoothPursuit
 
         private void Experiment_OnNextTrial(object aSender, Experiment.NextTrialArgs aArgs)
         {
-            lblTargetColor.BackColor = aArgs.TargetColor;
-            lblColor.BackColor = aArgs.StartColor;
+            ConfigLabel(lblTargetColor, aArgs.TargetColor, aArgs.TargetValue);
+            ConfigLabel(lblColor, aArgs.StartColor, aArgs.StartValue);
             iGazeControl.reset();
         }
 
@@ -196,14 +224,25 @@ namespace SmoothPursuit
 
         private void GazeControl_OnValueChnaged(object aSender, IGazeControl.ValueChangedArgs aArgs)
         {
-            this.Invoke(new Action(() => { lblColor.BackColor = iExperiment.CurrentTrial.createColor((int)aArgs.Current); }));
+            this.Invoke(new Action(() => { 
+                Experiment.Trial trial = iExperiment.CurrentTrial;
+                int value = (int)aArgs.Current;
+                ConfigLabel(lblColor,  trial.createColor(value), value);
+            }));
         }
 
         private void GazeControl_OnSoundPlayRequest(object sender, Rotation.Knob.SoundPlayRequestArgs e)
         {
-            iPlayer.setVolume(0, e.Volume, e.Volume);
-            iPlayer.play("sounds\\click.wav", "", 0);
+            if (SOUND_ENABLED)
+            {
+                iPlayer.setVolume(0, e.Volume, e.Volume);
+                iPlayer.play("sounds\\click.wav", "", 0);
+            }
         }
+
+        #endregion
+
+        #region GUI event handlers
 
         private void pcbControl_Paint(object sender, PaintEventArgs e)
         {
@@ -225,5 +264,7 @@ namespace SmoothPursuit
                 iExperiment.next(lblColor.BackColor);
             }
         }
+
+        #endregion
     }
 }

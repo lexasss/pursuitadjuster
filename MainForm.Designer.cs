@@ -48,17 +48,18 @@
             // 
             this.lblTargetColor.BackColor = System.Drawing.Color.Red;
             this.lblTargetColor.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lblTargetColor.Font = new System.Drawing.Font("Microsoft Sans Serif", 21.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.lblTargetColor.Location = new System.Drawing.Point(202, 191);
             this.lblTargetColor.Name = "lblTargetColor";
             this.lblTargetColor.Size = new System.Drawing.Size(100, 50);
             this.lblTargetColor.TabIndex = 1;
-            this.lblTargetColor.Text = "TARGET";
             this.lblTargetColor.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // lblColor
             // 
             this.lblColor.BackColor = System.Drawing.Color.White;
             this.lblColor.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lblColor.Font = new System.Drawing.Font("Microsoft Sans Serif", 21.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.lblColor.Location = new System.Drawing.Point(202, 256);
             this.lblColor.Name = "lblColor";
             this.lblColor.Size = new System.Drawing.Size(100, 50);

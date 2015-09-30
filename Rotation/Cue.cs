@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Text;
 
 namespace SmoothPursuit.Rotation
 {
@@ -47,20 +45,6 @@ namespace SmoothPursuit.Rotation
 
         #region Internal methods
 
-        private void SetAngle(double aAngle)
-        {
-            iAngle = new Angle(aAngle, true);
-
-            double dx = iRadius * Math.Cos(iAngle.Radians);
-            double dy = iRadius * Math.Sin(iAngle.Radians);
-
-            Location = new Point(
-                (int)(iCenter.X - iBitmapWidth / 2 + dx), 
-                (int)(iCenter.Y - iBitmapHeight / 2 + dy));
-        }
-
-        #endregion
-
         protected override void SetInitialLocation()
         {
             SetAngle(INITIAL_ANGLE + 2 * iSpeed);
@@ -77,5 +61,19 @@ namespace SmoothPursuit.Rotation
 
             SetAngle(iAngle.Degrees + speed);
         }
+
+        private void SetAngle(double aAngle)
+        {
+            iAngle = new Angle(aAngle, true);
+
+            double dx = iRadius * Math.Cos(iAngle.Radians);
+            double dy = iRadius * Math.Sin(iAngle.Radians);
+
+            Location = new Point(
+                (int)(iCenter.X - iBitmapWidth / 2 + dx), 
+                (int)(iCenter.Y - iBitmapHeight / 2 + dy));
+        }
+
+        #endregion
     }
 }

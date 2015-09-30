@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Drawing;
 
@@ -40,7 +39,7 @@ namespace SmoothPursuit
             {
                 private class SmoothedOffset
                 {
-                    private double ALPHA = 2.0;
+                    private const double ALPHA = 2.0;
 
                     private double iPrevDistance = Double.NaN;
                     private List<double> iDistances = new List<double>();
@@ -62,7 +61,7 @@ namespace SmoothPursuit
                                 double deviation = dist - mean;
                                 squareSum += deviation * deviation;
                             }
-                            return Math.Sqrt(squareSum / Count);    // check this
+                            return Math.Sqrt(squareSum / Count);
                         }
                     }
 
@@ -105,7 +104,7 @@ namespace SmoothPursuit
             private Processor iProcessor;
 
             public GazeTrack(GazePoint[] aBuffer)
-                : base(aBuffer[0], aBuffer[aBuffer.Length - 1], 0)
+                : base(aBuffer[0], aBuffer[aBuffer.Length - 1])
             {
                 iProcessor = new Processor(aBuffer);
 
@@ -122,22 +121,6 @@ namespace SmoothPursuit
                 }
             }
 
-            public override bool isFollowingIncreaseCue()
-            {
-
-                return State == State.Increase;
-            }
-
-            public override bool isFollowingDecreaseCue()
-            {
-                if (iProcessor.STDDecrease < DISTANCE_STD_THRESHOLD)
-                {
-                    State = State.Decrease;
-                }
-
-                return State == State.Decrease;
-            }
-
             public override string ToString()
             {
                 return new StringBuilder(base.ToString()).
@@ -145,18 +128,7 @@ namespace SmoothPursuit
                     AppendFormat("\t{0}", iProcessor.STDDecrease).
                     ToString();
             }
-
-            protected override double GetLength()
-            {
-                return 0;
-            }
         }
-
-        #endregion
-
-        #region Consts
-
-        private const int MAPPING_PRECISION = 40;           // pixels
 
         #endregion
 
@@ -170,11 +142,11 @@ namespace SmoothPursuit
         #region Public methods
 
         public OffsetPursueDetector(ICue aCueIncrease, ICue aCueDecrease)
-            : base(1)
+            : base()
         {
             iCueIncrease = aCueIncrease;
             iCueDecrease = aCueDecrease;
-            VALUE_CHANGE = 1;
+            iValueStep = 1;
         }
 
         #endregion

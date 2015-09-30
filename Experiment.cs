@@ -17,7 +17,9 @@ namespace SmoothPursuit
             private long iStartTimestamp = 0;
             private HiResTimestamp iHRTimestamp = new HiResTimestamp();
             
-            public int MainComponentIndex { get; private set; }
+            public int ColorComponentIndex { get; private set; }
+            public int TargetValue { get; private set; }
+            public int StartValue { get; private set; }
             public Color Target { get; private set; }
             public Color Start { get; private set; }
             public Color Result { get; private set; }
@@ -25,14 +27,16 @@ namespace SmoothPursuit
 
             public Trial()
             {
-                MainComponentIndex = iRand.Next(3);
-                Target = CreateColor(MainComponentIndex, iRand.Next(256));
-                Start = CreateColor(MainComponentIndex, 128);
+                ColorComponentIndex = iRand.Next(3);
+                TargetValue = iRand.Next(256);
+                StartValue = 128;
+                Target = CreateColor(ColorComponentIndex, TargetValue);
+                Start = CreateColor(ColorComponentIndex, StartValue);
             }
 
             public Color createColor(int aMainComponent)
             {
-                return CreateColor(MainComponentIndex, aMainComponent);
+                return CreateColor(ColorComponentIndex, aMainComponent);
             }
 
             public void start()
@@ -51,10 +55,10 @@ namespace SmoothPursuit
                 int[] targetComponents = new int[3] { Target.R, Target.G, Target.B };
                 int[] resultComponents = new int[3] { Result.R, Result.G, Result.B };
 
-                int diff = resultComponents[MainComponentIndex] - targetComponents[MainComponentIndex];
+                int diff = resultComponents[ColorComponentIndex] - targetComponents[ColorComponentIndex];
                 if (diff == 0)  // probably, the difference should be estimated from non-main component
                 {
-                    int componentIndex = MainComponentIndex + 1;
+                    int componentIndex = ColorComponentIndex + 1;
                     if (componentIndex > 2)
                         componentIndex = 0;
                     diff = resultComponents[componentIndex] - targetComponents[componentIndex];
@@ -98,10 +102,16 @@ namespace SmoothPursuit
         {
             public Color TargetColor { get; private set; }
             public Color StartColor { get; private set; }
-            public NextTrialArgs(Color aTargetColor, Color aStartColor)
+            public int TargetValue { get; private set; }
+            public int StartValue { get; private set; }
+
+            public NextTrialArgs(Trial aTrial)
             {
-                TargetColor = aTargetColor;
-                StartColor = aStartColor;
+                TargetColor = aTrial.Target;
+                TargetValue = aTrial.TargetValue;
+                
+                StartColor = aTrial.Start;
+                StartValue = aTrial.StartValue;
             }
         }
         public delegate void NextTrialHandler(object aSender, NextTrialArgs aArgs);
@@ -184,7 +194,7 @@ namespace SmoothPursuit
         private void StartNextTrial()
         {
             Trial trial = iTrials[iTrialIndex];
-            OnNextTrial(this, new NextTrialArgs(trial.Target, trial.Start));
+            OnNextTrial(this, new NextTrialArgs(trial));
             trial.start();
         }
 

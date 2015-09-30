@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Drawing;
 
@@ -43,7 +41,7 @@ namespace SmoothPursuit.Rotation
             }
         }
 
-        private class GazeTrack : Track
+        private class GazeTrack : SpeedTrack
         {
             public Angle Angle { get; private set; }
             // Speed is in rad / sec
@@ -79,6 +77,7 @@ namespace SmoothPursuit.Rotation
 
         private Point iCenter;
         private double iRadius;             // pixels
+        private double iExpectedSpeed;
 
         #endregion 
 
@@ -86,12 +85,13 @@ namespace SmoothPursuit.Rotation
 
         // aExpectedSpeed = rad / sec
         public PursueDetector(int aCenterX, int aCenterY, double aRadius, double aExpectedSpeed)
-            : base(aExpectedSpeed)
+            : base()
         {
             iCenter = new Point(aCenterX, aCenterY);
             iRadius = aRadius;
+            iExpectedSpeed = aExpectedSpeed;
 
-            VALUE_CHANGE = 1;   // angle, in degrees
+            iValueStep = 1;   // angle, in degrees
             //Console.WriteLine("Radius: {0} [{1} - {2}]", iRadius, iRadius * (1.0 - RADIUS_ERROR_THRESHOLD), iRadius * (1.0 + RADIUS_ERROR_THRESHOLD));
         }
 

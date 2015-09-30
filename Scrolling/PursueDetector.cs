@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 using System.Drawing;
 
 namespace SmoothPursuit.Scrolling
@@ -34,7 +31,7 @@ namespace SmoothPursuit.Scrolling
             }
         }
 
-        private class GazeTrack : Track
+        private class GazeTrack : SpeedTrack
         {
             public Point Distance { get; private set; }
 
@@ -68,18 +65,20 @@ namespace SmoothPursuit.Scrolling
         #region Internal members
 
         private Rectangle iSlideRect;
+        private double iExpectedSpeed;
 
         #endregion
 
         #region Public methods
 
         public PursueDetector(Rectangle aSlideRect, double aExpectedSpeed)  // aExpectedSpeed = pixels / sec
-            : base(aExpectedSpeed)
+            : base()
         {
             iSlideRect = aSlideRect;
             iSlideRect.Inflate(MAPPING_PRECISION, MAPPING_PRECISION);
+            iExpectedSpeed = aExpectedSpeed;
 
-            VALUE_CHANGE = 1;
+            iValueStep = 1;
         }
 
         #endregion
