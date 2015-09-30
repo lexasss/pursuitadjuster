@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SmoothPursuit.Rotation
+namespace SmoothPursuit
 {
     public class Angle
     {

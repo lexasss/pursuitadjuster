@@ -61,7 +61,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Rotation\Angle.cs" />
+    <Compile Include="Angle.cs" />
     <Compile Include="IGazeControl.cs" />
     <Compile Include="Rotation\Cue.cs" />
     <Compile Include="Libs\HiResTimestamp.cs" />

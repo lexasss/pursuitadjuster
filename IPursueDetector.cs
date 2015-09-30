@@ -169,7 +169,7 @@ namespace SmoothPursuit
                         OnValueChangeRequest(this, new ValueChangeRequestArgs(iValueStep));
                     else if (track.isFollowingDecreaseCue())
                         OnValueChangeRequest(this, new ValueChangeRequestArgs(-iValueStep));
-                    //Console.WriteLine("{0}\t\t|\t\t{1}", newDataPoint, track);
+                    Console.WriteLine("{0}\t\t|\t\t{1}", newDataPoint, track);
                 }
                 else
                 {
