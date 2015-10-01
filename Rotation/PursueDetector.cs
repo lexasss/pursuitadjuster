@@ -91,7 +91,6 @@ namespace SmoothPursuit.Rotation
             iRadius = aRadius;
             iExpectedSpeed = aExpectedSpeed;
 
-            iValueStep = 1;   // angle, in degrees
             //Console.WriteLine("Radius: {0} [{1} - {2}]", iRadius, iRadius * (1.0 - RADIUS_ERROR_THRESHOLD), iRadius * (1.0 + RADIUS_ERROR_THRESHOLD));
         }
 

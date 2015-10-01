@@ -244,7 +244,6 @@ namespace SmoothPursuit
         {
             iCueIncrease = aCueIncrease;
             iCueDecrease = aCueDecrease;
-            iValueStep = 1;
         }
 
         #endregion

@@ -9,6 +9,7 @@ namespace SmoothPursuit
 
         protected Image iImage;
         protected IPursueDetector iPursueDetector;
+        protected double iValueChangeStep = 1;
 
         #endregion
 

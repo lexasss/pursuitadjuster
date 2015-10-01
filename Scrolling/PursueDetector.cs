@@ -77,8 +77,6 @@ namespace SmoothPursuit.Scrolling
             iSlideRect = aSlideRect;
             iSlideRect.Inflate(MAPPING_PRECISION, MAPPING_PRECISION);
             iExpectedSpeed = aExpectedSpeed;
-
-            iValueStep = 1;
         }
 
         #endregion

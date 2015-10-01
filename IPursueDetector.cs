@@ -9,6 +9,12 @@ namespace SmoothPursuit
     {
         #region Declarations
 
+        public enum Direction
+        {
+            Increase,
+            Decrease
+        }
+
         protected enum State
         {
             Unknown,
@@ -118,7 +124,6 @@ namespace SmoothPursuit
 
         protected Queue<DataPoint> iDataBuffer = new Queue<DataPoint>();
         protected bool iReady = false;
-        protected double iValueStep = 1;
 
         #endregion
 
@@ -126,10 +131,10 @@ namespace SmoothPursuit
 
         public class ValueChangeRequestArgs : EventArgs
         {
-            public double ValueChange { get; private set; }
-            public ValueChangeRequestArgs(double aValueChange)
+            public Direction Direction { get; private set; }
+            public ValueChangeRequestArgs(Direction aDirection)
             {
-                ValueChange = aValueChange;
+                Direction = aDirection;
             }
         }
         public delegate void ValueChangeRequestHandler(object aSender, ValueChangeRequestArgs aArgs);
@@ -167,9 +172,9 @@ namespace SmoothPursuit
                     Track track = CreateTrack(firstDataPoint, newDataPoint);
 
                     if (track.isFollowingIncreaseCue())
-                        OnValueChangeRequest(this, new ValueChangeRequestArgs(iValueStep));
+                        OnValueChangeRequest(this, new ValueChangeRequestArgs(Direction.Increase));
                     else if (track.isFollowingDecreaseCue())
-                        OnValueChangeRequest(this, new ValueChangeRequestArgs(-iValueStep));
+                        OnValueChangeRequest(this, new ValueChangeRequestArgs(Direction.Decrease));
                     //Console.WriteLine("{0}\t\t|\t\t{1}", newDataPoint, track);
                 }
                 else
