@@ -38,6 +38,7 @@
             // pcbControl
             // 
             this.pcbControl.Location = new System.Drawing.Point(0, 0);
+            this.pcbControl.Margin = new System.Windows.Forms.Padding(0);
             this.pcbControl.Name = "pcbControl";
             this.pcbControl.Size = new System.Drawing.Size(500, 500);
             this.pcbControl.TabIndex = 0;
@@ -49,7 +50,7 @@
             this.lblTargetColor.BackColor = System.Drawing.Color.Red;
             this.lblTargetColor.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.lblTargetColor.Font = new System.Drawing.Font("Microsoft Sans Serif", 21.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblTargetColor.Location = new System.Drawing.Point(202, 191);
+            this.lblTargetColor.Location = new System.Drawing.Point(200, 195);
             this.lblTargetColor.Name = "lblTargetColor";
             this.lblTargetColor.Size = new System.Drawing.Size(100, 50);
             this.lblTargetColor.TabIndex = 1;
@@ -60,7 +61,7 @@
             this.lblColor.BackColor = System.Drawing.Color.White;
             this.lblColor.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.lblColor.Font = new System.Drawing.Font("Microsoft Sans Serif", 21.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblColor.Location = new System.Drawing.Point(202, 256);
+            this.lblColor.Location = new System.Drawing.Point(200, 255);
             this.lblColor.Name = "lblColor";
             this.lblColor.Size = new System.Drawing.Size(100, 50);
             this.lblColor.TabIndex = 2;
@@ -75,7 +76,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(503, 500);
+            this.ClientSize = new System.Drawing.Size(500, 500);
             this.Controls.Add(this.lblColor);
             this.Controls.Add(this.lblTargetColor);
             this.Controls.Add(this.pcbControl);

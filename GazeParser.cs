@@ -23,10 +23,12 @@ namespace SmoothPursuit
 
         #region Consts
 
+        public static int SAMPLE_INTERVAL { get { return 30; } }
+
         private const bool ENSURE_SMOOTH_PURSUIT = false;
         private const float ALPHA = 1f;
         private const double MIN_FIX_DIST = 70;     // pixels
-        private const int MAX_OFFSET = 400;         // pixels
+        private const int MAX_OFFSET = 0;         // pixels
         
         private readonly int OFFSET_X = 0;          // pixels
         private readonly int OFFSET_Y = 0;          // pixels
@@ -53,10 +55,13 @@ namespace SmoothPursuit
         public GazeParser()
         {
             Random rand = new Random();
-            OFFSET_X = rand.Next(2 * MAX_OFFSET) - MAX_OFFSET;
-            OFFSET_Y = rand.Next(2 * MAX_OFFSET) - MAX_OFFSET;
-            
-            iPointsTimer.Interval = 30;
+            if (MAX_OFFSET > 0)
+            {
+                OFFSET_X = rand.Next(2 * MAX_OFFSET) - MAX_OFFSET;
+                OFFSET_Y = rand.Next(2 * MAX_OFFSET) - MAX_OFFSET;
+            }
+
+            iPointsTimer.Interval = SAMPLE_INTERVAL;
             iPointsTimer.Tick += PointsTimer_Tick;
         }
 

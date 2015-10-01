@@ -9,24 +9,21 @@ namespace SmoothPursuit
     {
         #region Declarations
 
-        private class GazePoint : DataPoint
+        private class OffsetGazePoint : GazePoint
         {
-            public Point Location { get; private set; }
             public Point OffsetIncrease { get; private set; }
             public Point OffsetDecrease { get; private set; }
 
-            public GazePoint(int aTimestamp, Point aLocation, Point aOffsetIncrease, Point aOffsetDecrease)
-                : base(aTimestamp)
+            public OffsetGazePoint(int aTimestamp, Point aLocation, Point aOffsetIncrease, Point aOffsetDecrease)
+                : base(aTimestamp, aLocation)
             {
-                Location = aLocation;
                 OffsetIncrease = aOffsetIncrease;
                 OffsetDecrease = aOffsetDecrease;
             }
 
             public override string ToString()
             {
-                return new StringBuilder().
-                    AppendFormat("\t{0},{1}", Location.X, Location.Y).
+                return new StringBuilder(base.ToString()).
                     AppendFormat("\t{0},{1}", OffsetIncrease.X, OffsetIncrease.Y).
                     AppendFormat("\t{0},{1}", OffsetDecrease.X, OffsetDecrease.Y).
                     ToString();
@@ -134,14 +131,14 @@ namespace SmoothPursuit
                 public MovementStats Increase { get; private set; }
                 public MovementStats Decrease { get; private set; }
 
-                public Processor(GazePoint[] aBuffer)
+                public Processor(OffsetGazePoint[] aBuffer)
                 {
                     Distances increaseDistances = new Distances();
                     Distances decreaseDistances = new Distances();
                     Angles increaseAngles = new Angles();
                     Angles decreaseAngles = new Angles();
 
-                    foreach (GazePoint point in aBuffer)
+                    foreach (OffsetGazePoint point in aBuffer)
                     {
                         increaseDistances.feed(point.OffsetIncrease);
                         decreaseDistances.feed(point.OffsetDecrease);
@@ -154,7 +151,7 @@ namespace SmoothPursuit
                 }
             }
 
-            private const double DISTANCE_STD_THRESHOLD = 15.0;     // pixels
+            private const double DISTANCE_STD_THRESHOLD = 20.0;     // pixels
             private const double ANGLE_STD_THRESHOLD = 6.0;         // degrees
             private const double MAX_VAR_FROM_CUE_DISTANCE = 0.3;   // fraction
 
@@ -164,11 +161,11 @@ namespace SmoothPursuit
             private double iCueIncreaseDistance;
             private double iCueDecreaseDistance;
 
-            public GazeTrack(GazePoint[] aBuffer)
+            public GazeTrack(OffsetGazePoint[] aBuffer)
                 : base(aBuffer[0], aBuffer[aBuffer.Length - 1])
             {
-                GazePoint first = aBuffer[0];
-                GazePoint last = aBuffer[aBuffer.Length - 1];
+                OffsetGazePoint first = aBuffer[0];
+                OffsetGazePoint last = aBuffer[aBuffer.Length - 1];
                 iTrackDistance = GetDistance(first.Location, last.Location);
                 iCueIncreaseDistance = GetDistance(
                     new Point(first.Location.X - first.OffsetIncrease.X, first.Location.Y - first.OffsetIncrease.Y),
@@ -254,17 +251,17 @@ namespace SmoothPursuit
         {
             Point cueIncrease = iCueIncrease.Location;
             Point cueDecrease = iCueDecrease.Location;
-            return new GazePoint(aTimestamp, aPoint,
+            return new OffsetGazePoint(aTimestamp, aPoint,
                 new Point(aPoint.X - cueIncrease.X, aPoint.Y - cueIncrease.Y),
                 new Point(aPoint.X - cueDecrease.X, aPoint.Y - cueDecrease.Y));
         }
 
         protected override Track CreateTrack(DataPoint aFirstDataPoint, DataPoint aLastDataPoint)
         {
-            List<GazePoint> gazePoints = new List<GazePoint>();
+            List<OffsetGazePoint> gazePoints = new List<OffsetGazePoint>();
             foreach (DataPoint point in iDataBuffer.ToArray())
             {
-                gazePoints.Add((GazePoint)point);
+                gazePoints.Add((OffsetGazePoint)point);
             }
 
             return new GazeTrack(gazePoints.ToArray());

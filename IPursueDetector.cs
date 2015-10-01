@@ -30,6 +30,31 @@ namespace SmoothPursuit
             {
                 Timestamp = aTimestamp;
             }
+
+            public override string ToString()
+            {
+                return new StringBuilder().
+                    AppendFormat("{0}", Timestamp).
+                    ToString();
+            }
+        }
+
+        protected class GazePoint : DataPoint
+        {
+            public Point Location { get; private set; }
+
+            public GazePoint(int aTimestamp, Point aLocation)
+                : base(aTimestamp)
+            {
+                Location = aLocation;
+            }
+
+            public override string ToString()
+            {
+                return new StringBuilder(base.ToString()).
+                    AppendFormat("\t{0},{1}", Location.X, Location.Y).
+                    ToString();
+            }
         }
 
         protected abstract class Track
@@ -39,8 +64,11 @@ namespace SmoothPursuit
 
             public Track(DataPoint aFirst, DataPoint aLast)
             {
-                Duration = aLast.Timestamp - aFirst.Timestamp;
                 State = State.Unknown;
+                if (aLast != null && aFirst != null)
+                {
+                    Duration = aLast.Timestamp - aFirst.Timestamp;
+                }
             }
 
             public virtual bool isFollowingIncreaseCue()

@@ -18,37 +18,9 @@ namespace SmoothPursuit.Scrolling
 
         #region Internal members
 
-        private double iValue = -1;
         private Image iThumb;
         private Point iThumbLocation;
         private int iThumbLength;
-
-        private Cue iDecrease;
-        private Cue iIncrease;
-
-        #endregion
-
-        #region Properties
-
-        public override double Value
-        {
-            get { return iValue; }
-            protected set
-            {
-                double prev = iValue;
-                iValue = Math.Max(0, Math.Min(MAX_VALUE, value));
-
-                if (prev != iValue)
-                {
-                    iThumbLocation = new Point(
-                        SLIDER_X + (int)(iValue / MAX_VALUE * (SLIDER_WIDTH - iThumbLength)),
-                        SLIDER_Y
-                    );
-                    FireValueChanged(new ValueChangedArgs(prev, iValue));
-                    RequestSound(prev);
-                }
-            }
-        }
 
         #endregion
 
@@ -78,25 +50,29 @@ namespace SmoothPursuit.Scrolling
             iPursueDetector = pd;
         }
 
-        public override void start()
-        {
-            iDecrease.show();
-            iIncrease.show();
-        }
-
-        public override void stop()
-        {
-            iDecrease.hide();
-            iIncrease.hide();
-        }
-
         public override void draw(Graphics aGraphics)
         {
-            var container = aGraphics.BeginContainer();
             aGraphics.DrawImage(iThumb, iThumbLocation);
-            aGraphics.DrawImage(iDecrease.Bitmap, iDecrease.Location);
-            aGraphics.DrawImage(iIncrease.Bitmap, iIncrease.Location);
-            aGraphics.EndContainer(container);
+            base.draw(aGraphics);
+        }
+
+        public override string ToString()
+        {
+            return "SCROLLBAR";
+        }
+
+        #endregion
+
+        #region Internal methods
+
+        protected override void FireValueChanged(ValueChangedArgs aArgs)
+        {
+            iThumbLocation = new Point(
+                SLIDER_X + (int)(Value / MAX_VALUE * (SLIDER_WIDTH - iThumbLength)),
+                SLIDER_Y
+            );
+            
+            base.FireValueChanged(aArgs);
         }
 
         #endregion

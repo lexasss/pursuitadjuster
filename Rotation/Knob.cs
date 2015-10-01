@@ -16,31 +16,8 @@ namespace SmoothPursuit.Rotation
 
         #region Internal members
 
-        private double iValue = -1;
         private Image iIndicator;
         private Point iIndicatorLocation;
-
-        private Cue iIncrease;
-        private Cue iDecrease;
-
-        #endregion
-
-        #region Properties
-
-        public override double Value
-        {
-            get { return iValue; }
-            protected set {
-                double prev = iValue;
-                iValue = Math.Max(0, Math.Min(MAX_VALUE, value));
-
-                if (prev != iValue)
-                {
-                    FireValueChanged(new ValueChangedArgs(prev, iValue));
-                    RequestSound(prev);
-                }
-            }
-        }
 
         #endregion
 
@@ -58,7 +35,6 @@ namespace SmoothPursuit.Rotation
             iDecrease.OnVisibilityChanged += (s, e) => { FireRedraw(e); };
 
             iIndicator = new Bitmap(global::SmoothPursuit.Properties.Resources.indicator);
-
             iIndicatorLocation = new Point(-iIndicator.Width / 2, -INDICATOR_OFFSET);
 
             reset();
@@ -70,18 +46,6 @@ namespace SmoothPursuit.Rotation
             iPursueDetector = pd;
         }
 
-        public override void start()
-        {
-            iIncrease.show();
-            iDecrease.show();
-        }
-
-        public override void stop()
-        {
-            iIncrease.hide();
-            iDecrease.hide();
-        }
-
         public override void draw(Graphics aGraphics)
         {
             var container = aGraphics.BeginContainer();
@@ -90,8 +54,12 @@ namespace SmoothPursuit.Rotation
             aGraphics.DrawImage(iIndicator, iIndicatorLocation);
             aGraphics.EndContainer(container);
 
-            aGraphics.DrawImage(iIncrease.Bitmap, iIncrease.Location);
-            aGraphics.DrawImage(iDecrease.Bitmap, iDecrease.Location);
+            base.draw(aGraphics);
+        }
+
+        public override string ToString()
+        {
+            return "KNOB";
         }
 
         #endregion

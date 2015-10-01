@@ -7,30 +7,6 @@ namespace SmoothPursuit.Scrolling
     {
         #region Declarations
 
-        private class GazePoint : DataPoint
-        {
-            public Point Location { get; private set; }
-
-            public GazePoint(int aTimestamp, Point aLocation)
-                : base(aTimestamp)
-            {
-                Location = aLocation;
-            }
-
-            public bool isOnSlide(Rectangle aRect)
-            {
-                return aRect.Contains(Location);
-            }
-
-            public override string ToString()
-            {
-                return new StringBuilder().
-                    AppendFormat("\t{0}", Location.X).
-                    AppendFormat("\t{0}", Location.Y).
-                    ToString();
-            }
-        }
-
         private class GazeTrack : SpeedTrack
         {
             public Point Distance { get; private set; }
@@ -86,7 +62,7 @@ namespace SmoothPursuit.Scrolling
         protected override DataPoint CreateDataPoint(int aTimestamp, Point aPoint)
         {
             GazePoint newDataPoint = new GazePoint(aTimestamp, aPoint);
-            if (newDataPoint.isOnSlide(iSlideRect))
+            if (iSlideRect.Contains(newDataPoint.Location))
             {
                 return newDataPoint;
             }

@@ -16,17 +16,37 @@ namespace SmoothPursuit
 
         #region Internal members
 
-        protected Image iImage;
-        protected IPursueDetector iPursueDetector;
-        protected double iValueChangeStep = 1;
+        private double iValue = -1;
 
+        protected double iValueChangeStep = 1;
+        
+        protected Image iImage;                     // must be set in the derived class
+        protected IPursueDetector iPursueDetector;  // must be set in the derived class
+
+        protected ICue iIncrease;   // must be set in the derived class
+        protected ICue iDecrease;   // must be set in the derived class
+        
         #endregion
 
         #region Properties
 
-        public abstract double Value { get; protected set; }
         public IPursueDetector PursueDetector { get { return iPursueDetector; } }
         public Image Image { get { return iImage; } }
+        public double Value
+        {
+            get { return iValue; }
+            protected set
+            {
+                double prev = iValue;
+                iValue = Math.Max(0, Math.Min(MAX_VALUE, value));
+
+                if (prev != iValue)
+                {
+                    FireValueChanged(new ValueChangedArgs(prev, iValue));
+                    RequestSound(prev);
+                }
+            }
+        }
 
         #endregion
 
@@ -60,11 +80,28 @@ namespace SmoothPursuit
 
         #endregion
 
-        #region Interface
+        #region Public methods
 
-        public abstract void start();
-        public abstract void stop();
-        public abstract void draw(Graphics aGraphics);
+        public virtual void start()
+        {
+            iIncrease.show();
+            iDecrease.show();
+        }
+
+        public virtual void stop()
+        {
+            iIncrease.hide();
+            iDecrease.hide();
+        }
+
+        public virtual void draw(Graphics aGraphics)
+        {
+            if (iDecrease.Visible)
+            {
+                aGraphics.DrawImage(iDecrease.Bitmap, iDecrease.Location);
+                aGraphics.DrawImage(iIncrease.Bitmap, iIncrease.Location);
+            }
+        }
 
         public void reset()
         {

@@ -46,6 +46,7 @@ namespace SmoothPursuit
 
         #region Properties
 
+        public bool Visible { get; private set; }
         public Bitmap Bitmap { get; protected set; }
         public Point Location
         {
@@ -59,6 +60,16 @@ namespace SmoothPursuit
             {
                 System.Threading.Interlocked.Exchange(ref iLocationX, value.X);
                 System.Threading.Interlocked.Exchange(ref iLocationY, value.Y);
+            }
+        }
+
+        public Point Center
+        {
+            get
+            {
+                return new Point(
+                    (int)(iLocationX + Bitmap.Width / 2),
+                    (int)(iLocationY + Bitmap.Height / 2));
             }
         }
 
@@ -79,7 +90,7 @@ namespace SmoothPursuit
             Bitmap = aBitmap;
             iSpeed = aSpeed;
 
-            Location = new Point(-100, -100);
+            Hide();
 
             iTimer.Interval = STEP_DURATION;
             iTimer.Tick += Timer_Tick;
@@ -89,19 +100,30 @@ namespace SmoothPursuit
         {
             iStepCounter = 0;
 
+            Visible = true;
             OnVisibilityChanged(this, new EventArgs());
 
             SetInitialLocation();
             OnLocationChanged(this, new LocationChangedArgs(Location));
 
-            iTimer.Start();
+            if (iSpeed != 0)
+            {
+                iTimer.Start();
+            }
 
             //iStartTimestamp = iHRTimestamp.Milliseconds;
         }
 
         public virtual void hide()
         {
-            iStepCounter = -ACCELERATION_STEPS;
+            if (iSpeed != 0)
+            {
+                iStepCounter = -ACCELERATION_STEPS;
+            }
+            else
+            {
+                Hide();
+            }
         }
 
         #endregion
@@ -118,8 +140,7 @@ namespace SmoothPursuit
             if (iStepCounter == 0)
             {
                 iTimer.Stop();
-                Location = new Point(-100, -100);
-                OnVisibilityChanged(this, new EventArgs());
+                Hide();
                 return;
             }
             else
@@ -144,6 +165,13 @@ namespace SmoothPursuit
 
             iTimer.Start();
              */
+        }
+
+        private void Hide()
+        {
+            Visible = false;
+            //Location = new Point(-100, -100);
+            OnVisibilityChanged(this, new EventArgs());
         }
 
         #endregion

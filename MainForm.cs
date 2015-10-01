@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using ETUDriver;
@@ -10,7 +11,7 @@ namespace SmoothPursuit
     {
         #region Consts
 
-        private const bool COLOR_VALUE_VISIBLE = true;
+        private const bool COLOR_VALUE_VISIBLE = false;
         private const bool SOUND_ENABLED = true;
         private const bool CONTROL_ARE_INVISIBLE_WHEN_NOT_TRACKING = false;
 
@@ -26,6 +27,10 @@ namespace SmoothPursuit
 
         private Rotation.Knob iKnob;
         private Scrolling.Bar iScrollbar;
+        private Static.Control iStaticControl;
+
+        private List<IGazeControl> iGazeControls = new List<IGazeControl>();
+        private int iGazeControlIndex = -1;
 
         private TheCodeKing.ActiveButtons.Controls.IActiveMenu iMenu;
         private TheCodeKing.ActiveButtons.Controls.ActiveButton mbnOptions;
@@ -64,9 +69,18 @@ namespace SmoothPursuit
             iScrollbar.OnSoundPlayRequest += GazeControl_OnSoundPlayRequest;
             iScrollbar.OnRedraw += GazeControl_OnRedraw;
 
+            iStaticControl = new Static.Control();
+            iStaticControl.OnValueChanged += GazeControl_OnValueChnaged;
+            iStaticControl.OnSoundPlayRequest += GazeControl_OnSoundPlayRequest;
+            iStaticControl.OnRedraw += GazeControl_OnRedraw;
+
+            iGazeControls.Add(iKnob);
+            iGazeControls.Add(iScrollbar);
+            iGazeControls.Add(iStaticControl);
+
             iParser = new GazeParser();
 
-            SetGazeControl(iKnob);
+            SetGazeControl();
 
             iPlayer = new Utils.WavPlayer();
             iPlayer.init();
@@ -78,15 +92,26 @@ namespace SmoothPursuit
 
         #region Internal methods
 
-        private void SetGazeControl(IGazeControl aGazeControl)
+        private int GetNextGazeControlIndex()
         {
-            iGazeControl = aGazeControl;
+            int index = iGazeControlIndex + 1;
+            if (index < 0 || iGazeControls.Count <= index)
+                index = 0;
+
+            return index;
+        }
+
+        private void SetGazeControl()
+        {
+            iGazeControlIndex = GetNextGazeControlIndex();
+
+            iGazeControl = iGazeControls[iGazeControlIndex];
             iParser.PursueDetector = iGazeControl.PursueDetector;
             
             pcbControl.Image = iGazeControl.Image;
             pcbControl.Visible = !CONTROL_ARE_INVISIBLE_WHEN_NOT_TRACKING;
 
-            mbnToggleStimuli.Text = iGazeControl is Rotation.Knob ? "Switch to SCROLLBAR"  : "Switch to KNOB";
+            mbnToggleStimuli.Text = String.Format("Switch to {0}", iGazeControls[GetNextGazeControlIndex()]);
         }
 
         private void EnabledMenuButtons()
@@ -138,7 +163,7 @@ namespace SmoothPursuit
             mbnToggleStimuli = new TheCodeKing.ActiveButtons.Controls.ActiveButton();
             mbnToggleStimuli.Click += (s, e) =>
             {
-                SetGazeControl(iGazeControl is Rotation.Knob ? (IGazeControl)iScrollbar : (IGazeControl)iKnob);
+                SetGazeControl();
             };
 
             iMenu.Items.Add(mbnToggleStimuli);
