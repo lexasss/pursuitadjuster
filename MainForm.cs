@@ -13,7 +13,8 @@ namespace SmoothPursuit
 
         private const bool COLOR_VALUE_VISIBLE = false;
         private const bool SOUND_ENABLED = true;
-        private const bool CONTROL_ARE_INVISIBLE_WHEN_NOT_TRACKING = false;
+        private const bool CONTROL_INVISIBLE_WHEN_NOT_TRACKING = false;
+        private const int TRIAL_COUNT = 20;
 
         #endregion
 
@@ -53,7 +54,7 @@ namespace SmoothPursuit
             iETUDriver.OnCalibrated += ETUDriver_OnCalibrated;
             iETUDriver.OnDataEvent += ETUDriver_OnDataEvent;
 
-            iExperiment = new Experiment(3);
+            iExperiment = new Experiment(TRIAL_COUNT);
             iExperiment.OnNextTrial += Experiment_OnNextTrial;
             iExperiment.OnFinished += Experiment_OnFinished;
 
@@ -109,7 +110,7 @@ namespace SmoothPursuit
             iParser.PursueDetector = iGazeControl.PursueDetector;
             
             pcbControl.Image = iGazeControl.Image;
-            pcbControl.Visible = !CONTROL_ARE_INVISIBLE_WHEN_NOT_TRACKING;
+            pcbControl.Visible = !CONTROL_INVISIBLE_WHEN_NOT_TRACKING;
 
             mbnToggleStimuli.Text = String.Format("Switch to {0}", iGazeControls[GetNextGazeControlIndex()]);
         }
@@ -156,7 +157,7 @@ namespace SmoothPursuit
                 {
                     iETUDriver.stopTracking();
                     iExperiment.stop();
-                    pcbControl.Visible = !CONTROL_ARE_INVISIBLE_WHEN_NOT_TRACKING;
+                    pcbControl.Visible = !CONTROL_INVISIBLE_WHEN_NOT_TRACKING;
                 }
             };
 
