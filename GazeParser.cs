@@ -23,12 +23,13 @@ namespace SmoothPursuit
 
         #region Consts
 
-        private const float ALPHA = 0.2f;
-        private const double MIN_FIX_DIST = 50;     // pixels
+        private const bool ENSURE_SMOOTH_PURSUIT = false;
+        private const float ALPHA = 1f;
+        private const double MIN_FIX_DIST = 70;     // pixels
         private const int MAX_OFFSET = 400;         // pixels
         
-        private readonly int OFFSET_X = 0;
-        private readonly int OFFSET_Y = 0;
+        private readonly int OFFSET_X = 0;          // pixels
+        private readonly int OFFSET_Y = 0;          // pixels
 
         #endregion
 
@@ -115,7 +116,10 @@ namespace SmoothPursuit
 
         private void ProcessNewPoint(int aTimestamp, Point aPoint)
         {
-            EnsureSmoothPursuit(aPoint);
+            if (ENSURE_SMOOTH_PURSUIT)
+            {
+                EnsureSmoothPursuit(aPoint);
+            }
 
             if (PursueDetector != null)
             {

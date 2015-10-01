@@ -10,8 +10,8 @@ namespace SmoothPursuit
     {
         #region Consts
 
-        private const bool COLOR_VALUE_VISIBLE = false;
-        private const bool SOUND_ENABLED = false;
+        private const bool COLOR_VALUE_VISIBLE = true;
+        private const bool SOUND_ENABLED = true;
         private const bool CONTROL_ARE_INVISIBLE_WHEN_NOT_TRACKING = false;
 
         #endregion

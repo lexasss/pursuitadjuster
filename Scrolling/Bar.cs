@@ -8,13 +8,11 @@ namespace SmoothPursuit.Scrolling
         #region Consts
 
         private const int TARGET_SPEED = 3;     // pixels per step
-        private const double MAX_VALUE = 255;
-        private const uint VOLUME = 8;          // 1..16
 
         private const int SLIDER_X = 44;
-        private const int SLIDER_Y = 441;
+        private const int SLIDER_Y = 337;
         private const int SLIDER_WIDTH = 411;
-        private const int SLIDER_HEIGHT = 36;
+        private const int SLIDER_HEIGHT = 40;
 
         #endregion
 
@@ -27,14 +25,6 @@ namespace SmoothPursuit.Scrolling
 
         private Cue iDecrease;
         private Cue iIncrease;
-
-        #endregion
-
-        #region Events
-
-        public override event ValueChangedHandler OnValueChanged = delegate { };
-        public override event SoundPlayRequestHandler OnSoundPlayRequest = delegate { };
-        public override event EventHandler OnRedraw = delegate { };
 
         #endregion
 
@@ -54,7 +44,7 @@ namespace SmoothPursuit.Scrolling
                         SLIDER_X + (int)(iValue / MAX_VALUE * (SLIDER_WIDTH - iThumbLength)),
                         SLIDER_Y
                     );
-                    OnValueChanged(this, new ValueChangedArgs(prev, iValue));
+                    FireValueChanged(new ValueChangedArgs(prev, iValue));
                     RequestSound(prev);
                 }
             }
@@ -69,17 +59,17 @@ namespace SmoothPursuit.Scrolling
             iImage = global::SmoothPursuit.Properties.Resources.scrollbar;
             Rectangle cuePath = new Rectangle(SLIDER_X, SLIDER_Y, SLIDER_WIDTH, SLIDER_HEIGHT);
 
-            iDecrease = new Cue(global::SmoothPursuit.Properties.Resources.left, -TARGET_SPEED, cuePath);
-            iDecrease.OnVisibilityChanged += (s, e) => { OnRedraw(this, e); };
+            iDecrease = new Cue(global::SmoothPursuit.Properties.Resources.decrease, -TARGET_SPEED, cuePath);
+            iDecrease.OnVisibilityChanged += (s, e) => { FireRedraw(e); };
 
-            iIncrease = new Cue(global::SmoothPursuit.Properties.Resources.right, TARGET_SPEED, cuePath);
-            iIncrease.OnLocationChanged += (s, e) => { OnRedraw(this, e); };
-            iIncrease.OnVisibilityChanged += (s, e) => { OnRedraw(this, e); };
+            iIncrease = new Cue(global::SmoothPursuit.Properties.Resources.increase, TARGET_SPEED, cuePath);
+            iIncrease.OnLocationChanged += (s, e) => { FireRedraw(e); };
+            iIncrease.OnVisibilityChanged += (s, e) => { FireRedraw(e); };
 
             iThumb = new Bitmap(global::SmoothPursuit.Properties.Resources.thumb);
             iThumbLength = iThumb.Width;
 
-            Value = (int)(MAX_VALUE / 2);
+            reset();
 
             //PursueDetector pd = new PursueDetector(new Rectangle(SLIDER_X, SLIDER_Y, SLIDER_WIDTH, SLIDER_HEIGHT), iIncrease.Speed);
             OffsetPursueDetector pd = new OffsetPursueDetector(iIncrease, iDecrease);
@@ -107,18 +97,6 @@ namespace SmoothPursuit.Scrolling
             aGraphics.DrawImage(iDecrease.Bitmap, iDecrease.Location);
             aGraphics.DrawImage(iIncrease.Bitmap, iIncrease.Location);
             aGraphics.EndContainer(container);
-        }
-
-        #endregion
-
-        #region Internal members
-
-        private void RequestSound(double aPrevValue)
-        {
-            if ((int)(aPrevValue / 3) != (int)(iValue / 3))
-            {
-                OnSoundPlayRequest(this, new SoundPlayRequestArgs(VOLUME));
-            }
         }
 
         #endregion

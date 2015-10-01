@@ -14,6 +14,11 @@ namespace SmoothPursuit
         {
             private static Random iRand = new Random();
 
+            private bool IS_GREYCOLOR = true;
+            private int COLOR_EDGE_GAP = 30;
+            private int COLOR_START_GAP = 30;
+            private int START_VALUE = 128;
+
             private long iStartTimestamp = 0;
             private HiResTimestamp iHRTimestamp = new HiResTimestamp();
             
@@ -28,8 +33,13 @@ namespace SmoothPursuit
             public Trial()
             {
                 ColorComponentIndex = iRand.Next(3);
-                TargetValue = iRand.Next(256);
-                StartValue = 128;
+                StartValue = START_VALUE;
+
+                do
+                {
+                    TargetValue = COLOR_EDGE_GAP + iRand.Next(256 - 2 * COLOR_EDGE_GAP);
+                } while (START_VALUE - COLOR_START_GAP < TargetValue && TargetValue < START_VALUE + COLOR_START_GAP);
+
                 Target = CreateColor(ColorComponentIndex, TargetValue);
                 Start = CreateColor(ColorComponentIndex, StartValue);
             }
@@ -79,7 +89,14 @@ namespace SmoothPursuit
                 int[] components = new int[3];
                 for (int compIndex = 0; compIndex < 3; compIndex++)
                 {
-                    components[compIndex] = compIndex == aMainComponentIndex ? mainComp : restComp;
+                    if (IS_GREYCOLOR)
+                    {
+                        components[compIndex] = aMainComponent;
+                    }
+                    else
+                    {
+                        components[compIndex] = compIndex == aMainComponentIndex ? mainComp : restComp;
+                    }
                 }
 
                 return Color.FromArgb(components[0], components[1], components[2]);

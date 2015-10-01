@@ -56,13 +56,13 @@
     <Compile Include="Experiment.cs" />
     <Compile Include="ICue.cs" />
     <Compile Include="OffsetPursueDetector.cs" />
+    <Compile Include="Angle.cs" />
+    <Compile Include="IGazeControl.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Angle.cs" />
-    <Compile Include="IGazeControl.cs" />
     <Compile Include="Rotation\Cue.cs" />
     <Compile Include="Libs\HiResTimestamp.cs" />
     <Compile Include="IPursueDetector.cs" />
@@ -132,22 +132,10 @@
     <None Include="res\decrease.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\down.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="res\scrollbar.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\up.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="res\thumb.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="res\left.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="res\right.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

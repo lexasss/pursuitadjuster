@@ -11,9 +11,6 @@ namespace SmoothPursuit.Rotation
         private const float MIN_ANGLE = -135;           // degrees
         private const float MAX_ANGLE = 135;            // degrees
         private const double TARGET_SPEED = 1.4;        // degrees per step
-        private const double MAX_VALUE = 255;
-        private const uint VOLUME_MIN = 1;
-        private const uint VOLUME_MAX = 16;
         
         #endregion
 
@@ -28,14 +25,6 @@ namespace SmoothPursuit.Rotation
 
         #endregion
 
-        #region Events
-
-        public override event ValueChangedHandler OnValueChanged = delegate { };
-        public override event SoundPlayRequestHandler OnSoundPlayRequest = delegate { };
-        public override event EventHandler OnRedraw = delegate { };
-
-        #endregion
-
         #region Properties
 
         public override double Value
@@ -47,7 +36,7 @@ namespace SmoothPursuit.Rotation
 
                 if (prev != iValue)
                 {
-                    OnValueChanged(this, new ValueChangedArgs(prev, iValue));
+                    FireValueChanged(new ValueChangedArgs(prev, iValue));
                     RequestSound(prev);
                 }
             }
@@ -62,17 +51,17 @@ namespace SmoothPursuit.Rotation
             iImage = global::SmoothPursuit.Properties.Resources.knob;
 
             iIncrease = new Cue(global::SmoothPursuit.Properties.Resources.increase, TARGET_SPEED, iImage.Size);
-            iIncrease.OnVisibilityChanged += (s, e) => { OnRedraw(this, e); };
+            iIncrease.OnVisibilityChanged += (s, e) => { FireRedraw(e); };
 
             iDecrease = new Cue(global::SmoothPursuit.Properties.Resources.decrease, -TARGET_SPEED, iImage.Size);
-            iDecrease.OnLocationChanged += (s, e) => { OnRedraw(this, e); };
-            iDecrease.OnVisibilityChanged += (s, e) => { OnRedraw(this, e); };
+            iDecrease.OnLocationChanged += (s, e) => { FireRedraw(e); };
+            iDecrease.OnVisibilityChanged += (s, e) => { FireRedraw(e); };
 
             iIndicator = new Bitmap(global::SmoothPursuit.Properties.Resources.indicator);
 
             iIndicatorLocation = new Point(-iIndicator.Width / 2, -INDICATOR_OFFSET);
 
-            Value = (int)(MAX_VALUE / 2);
+            reset();
 
             //PursueDetector pd = new PursueDetector(iImage.Width / 2, iImage.Height / 2, iIncrease.Radius, iIncrease.Speed * Math.PI / 180);
             OffsetPursueDetector pd = new OffsetPursueDetector(iIncrease, iDecrease);
@@ -103,19 +92,6 @@ namespace SmoothPursuit.Rotation
 
             aGraphics.DrawImage(iIncrease.Bitmap, iIncrease.Location);
             aGraphics.DrawImage(iDecrease.Bitmap, iDecrease.Location);
-        }
-
-        #endregion
-
-        #region Internal members
-
-        private void RequestSound(double aPrevValue)
-        {
-            if ((int)(aPrevValue / 3) != (int)(iValue / 3))
-            {
-                uint volume = VOLUME_MIN + (uint)Math.Round((VOLUME_MAX - VOLUME_MIN) * iValue / MAX_VALUE);
-                OnSoundPlayRequest(this, new SoundPlayRequestArgs(volume));
-            }
         }
 
         #endregion

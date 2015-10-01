@@ -5,6 +5,15 @@ namespace SmoothPursuit
 {
     public abstract class IGazeControl
     {
+        #region Consts
+
+        protected const double MAX_VALUE = 255;
+        private const uint VOLUME_MIN = 1;
+        private const uint VOLUME_MAX = 16;
+        private const uint VOLUME = 8;          // VOLUME_MIN..VOLUME_MAX, or 0 for the value-based
+
+        #endregion
+
         #region Internal members
 
         protected Image iImage;
@@ -34,7 +43,7 @@ namespace SmoothPursuit
             }
         }
         public delegate void ValueChangedHandler(object aSender, ValueChangedArgs aArgs);
-        public abstract event ValueChangedHandler OnValueChanged;
+        public event ValueChangedHandler OnValueChanged = delegate { };
 
         public class SoundPlayRequestArgs : EventArgs
         {
@@ -45,9 +54,9 @@ namespace SmoothPursuit
             }
         }
         public delegate void SoundPlayRequestHandler(object aSender, SoundPlayRequestArgs aArgs);
-        public abstract event SoundPlayRequestHandler OnSoundPlayRequest;
-        
-        public abstract event EventHandler OnRedraw;
+        public event SoundPlayRequestHandler OnSoundPlayRequest = delegate { };
+
+        public event EventHandler OnRedraw = delegate { };
 
         #endregion
 
@@ -59,7 +68,44 @@ namespace SmoothPursuit
 
         public void reset()
         {
-            Value = 128;
+            Value = (int)(MAX_VALUE / 2);
+        }
+
+        #endregion
+
+        #region Internal members
+
+        protected virtual void FireValueChanged(ValueChangedArgs aArgs)
+        {
+            OnValueChanged(this, aArgs);
+        }
+
+        protected virtual void FireSoundPlayRequest(SoundPlayRequestArgs aArgs)
+        {
+            OnSoundPlayRequest(this, aArgs);
+        }
+
+        protected virtual void FireRedraw(EventArgs aArgs)
+        {
+            OnRedraw(this, aArgs);
+        }
+
+        protected virtual void RequestSound(double aPrevValue)
+        {
+            if ((int)(aPrevValue / 3) != (int)(Value / 3))
+            {
+                uint volume;
+                if (VOLUME > 0)
+                {
+                    volume = VOLUME;
+                }
+                else
+                {
+                    volume = VOLUME_MIN + (uint)Math.Round((VOLUME_MAX - VOLUME_MIN) * Value / MAX_VALUE);
+                }
+
+                FireSoundPlayRequest(new SoundPlayRequestArgs(volume));
+            }
         }
 
         #endregion
