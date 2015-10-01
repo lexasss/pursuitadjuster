@@ -10,7 +10,7 @@ namespace SmoothPursuit.Scrolling
         private const int TARGET_SPEED = 3;     // pixels per step
 
         private const int SLIDER_X = 44;
-        private const int SLIDER_Y = 337;
+        private const int SLIDER_Y = 330;
         private const int SLIDER_WIDTH = 411;
         private const int SLIDER_HEIGHT = 40;
 

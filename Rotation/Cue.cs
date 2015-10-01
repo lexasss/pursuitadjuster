@@ -7,7 +7,7 @@ namespace SmoothPursuit.Rotation
     {
         #region Consts
 
-        private const double RADIUS = 0.35;         // fraction of the min(width, height)
+        private const double RADIUS = 0.265;        // fraction of the min(width, height)
         private const double INITIAL_ANGLE = 90;    // degrees
 
         #endregion

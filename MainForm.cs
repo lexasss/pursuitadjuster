@@ -108,6 +108,7 @@ namespace SmoothPursuit
 
             iGazeControl = iGazeControls[iGazeControlIndex];
             iParser.PursueDetector = iGazeControl.PursueDetector;
+            iParser.OffsetEnabled = iGazeControl != iStaticControl;
             
             pcbControl.Image = iGazeControl.Image;
             pcbControl.Visible = !CONTROL_INVISIBLE_WHEN_NOT_TRACKING;

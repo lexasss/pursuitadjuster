@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SmoothVolume")]
+[assembly: AssemblyTitle("SmoothPursuitControl")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("University of Tampere")]
-[assembly: AssemblyProduct("SmoothVolume")]
+[assembly: AssemblyProduct("SmoothPursuitControl")]
 [assembly: AssemblyCopyright("Copyright © University of Tampere 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

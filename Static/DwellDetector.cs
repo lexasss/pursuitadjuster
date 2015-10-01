@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Drawing;
+﻿using System.Drawing;
 
 namespace SmoothPursuit.Static
 {
@@ -66,13 +62,6 @@ namespace SmoothPursuit.Static
                 else
                     State = IPursueDetector.State.Unknown;
             }
-
-            public override string ToString()
-            {
-                return new StringBuilder(base.ToString()).
-                    AppendFormat("\t{0,8:N3}", 11.1).
-                    ToString();
-            }
         }
 
         #endregion
@@ -97,6 +86,8 @@ namespace SmoothPursuit.Static
 
         #endregion
 
+        #region Internal methods
+
         protected override IPursueDetector.DataPoint CreateDataPoint(int aTimestamp, Point aPoint)
         {
             return new GazePoint(aTimestamp, aPoint);
@@ -110,5 +101,7 @@ namespace SmoothPursuit.Static
             iTrack.updateState(iIncreaseArea.Activated, iDecreaseArea.Activated);
             return iTrack;
         }
+
+        #endregion
     }
 }

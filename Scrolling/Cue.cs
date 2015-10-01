@@ -52,7 +52,7 @@ namespace SmoothPursuit.Scrolling
             iLattitude = aX;
             Location = new Point(
                 (int)Math.Round((double)(iLattitude - iBitmapCenter.X)),
-                (int)Math.Round(iInitialPosition.Y - iBitmapCenter.Y - 8)); // 8 - a hack to show the cue higher
+                (int)Math.Round(iInitialPosition.Y - iBitmapCenter.Y));
         }
 
         private void SlideBy(double aDistance)

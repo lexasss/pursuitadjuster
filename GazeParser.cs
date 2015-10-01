@@ -25,10 +25,10 @@ namespace SmoothPursuit
 
         public static int SAMPLE_INTERVAL { get { return 30; } }
 
-        private const bool ENSURE_SMOOTH_PURSUIT = false;
+        private const bool ENSURE_SMOOTH_PURSUIT = true;
         private const float ALPHA = 1f;
         private const double MIN_FIX_DIST = 70;     // pixels
-        private const int MAX_OFFSET = 0;         // pixels
+        private const int MAX_OFFSET = 400;         // pixels
         
         private readonly int OFFSET_X = 0;          // pixels
         private readonly int OFFSET_Y = 0;          // pixels
@@ -47,6 +47,7 @@ namespace SmoothPursuit
         #region Properties
 
         public IPursueDetector PursueDetector { get; set; }
+        public bool OffsetEnabled { get; set; }
 
         #endregion
 
@@ -55,11 +56,10 @@ namespace SmoothPursuit
         public GazeParser()
         {
             Random rand = new Random();
-            if (MAX_OFFSET > 0)
-            {
-                OFFSET_X = rand.Next(2 * MAX_OFFSET) - MAX_OFFSET;
-                OFFSET_Y = rand.Next(2 * MAX_OFFSET) - MAX_OFFSET;
-            }
+            OFFSET_X = rand.Next(2 * MAX_OFFSET) - MAX_OFFSET;
+            OFFSET_Y = rand.Next(2 * MAX_OFFSET) - MAX_OFFSET;
+
+            OffsetEnabled = true;
 
             iPointsTimer.Interval = SAMPLE_INTERVAL;
             iPointsTimer.Tick += PointsTimer_Tick;
@@ -85,7 +85,9 @@ namespace SmoothPursuit
 
         public void feed(int aTimestamp, Point aPoint)
         {
-            Point gazePoint = new Point(aPoint.X + OFFSET_X, aPoint.Y + OFFSET_Y);
+            Point gazePoint = new Point(
+                aPoint.X + (OffsetEnabled ? OFFSET_X : 0),
+                aPoint.Y + (OffsetEnabled ? OFFSET_Y : 0));
             lock (iPointBuffer)
             {
                 iPointBuffer.Enqueue(new GazePoint(aTimestamp, gazePoint));

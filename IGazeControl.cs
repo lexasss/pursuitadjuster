@@ -105,7 +105,7 @@ namespace SmoothPursuit
 
         public void reset()
         {
-            Value = (int)(MAX_VALUE / 2);
+            Value = (int)(MAX_VALUE / 2 + 0.5);
         }
 
         #endregion
