@@ -178,7 +178,7 @@ namespace SmoothPursuit
             iDataBuffer.Clear();
         }
 
-        public virtual void saccade()
+        public virtual void reset()
         {
             iReady = false;
             iDataBuffer.Clear();

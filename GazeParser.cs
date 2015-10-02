@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Drawing;
 
 namespace SmoothPursuit
@@ -29,6 +30,7 @@ namespace SmoothPursuit
         private const float ALPHA = 0.5f;
         private const double MIN_FIX_DIST = 70;     // pixels
         private const int MAX_OFFSET = 400;         // pixels
+        private const int MIN_OFFSET = 200;         // pixels
         
         private readonly int OFFSET_X = 0;          // pixels
         private readonly int OFFSET_Y = 0;          // pixels
@@ -56,8 +58,10 @@ namespace SmoothPursuit
         public GazeParser()
         {
             Random rand = new Random();
-            OFFSET_X = rand.Next(2 * MAX_OFFSET) - MAX_OFFSET;
-            OFFSET_Y = rand.Next(2 * MAX_OFFSET) - MAX_OFFSET;
+            while (Math.Abs(OFFSET_X) < MIN_OFFSET)
+                OFFSET_X = rand.Next(2 * MAX_OFFSET) - MAX_OFFSET;
+            while (Math.Abs(OFFSET_Y) < MIN_OFFSET)
+                OFFSET_Y = rand.Next(2 * MAX_OFFSET) - MAX_OFFSET;
 
             OffsetEnabled = true;
 
@@ -94,6 +98,14 @@ namespace SmoothPursuit
             }
         }
 
+        public override string ToString()
+        {
+            return new StringBuilder().
+                AppendFormat("\tOffsetX={0}", OFFSET_X).
+                AppendFormat("\tOffsetY={0}", OFFSET_Y).
+                ToString();
+        }
+
         #endregion
 
         #region Internal methods
@@ -114,7 +126,7 @@ namespace SmoothPursuit
                 //Console.WriteLine("{0:N0}", distance);
                 if (distance > MIN_FIX_DIST)
                 {
-                    PursueDetector.saccade();
+                    PursueDetector.reset();
                 }
             }
 

@@ -233,7 +233,7 @@ namespace SmoothPursuit
             iETUDriver.stopTracking();
             if (sfdSaveData.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                iExperiment.save(sfdSaveData.FileName);
+                iExperiment.save(sfdSaveData.FileName, iParser.ToString());
             }
         }
 
@@ -289,6 +289,7 @@ namespace SmoothPursuit
             if (e.KeyCode == Keys.Space)
             {
                 iExperiment.next(lblColor.BackColor);
+                iGazeControl.PursueDetector.reset();
             }
         }
 

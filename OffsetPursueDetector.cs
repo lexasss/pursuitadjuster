@@ -185,7 +185,11 @@ namespace SmoothPursuit
 
             private const double DISTANCE_STD_THRESHOLD = 15.0;     // pixels
             private const double ANGLE_STD_THRESHOLD = 6.0;         // degrees
-            private const double MAX_VAR_FROM_CUE_DISTANCE = 0.3;   // fraction
+            private const double MAX_VAR_FROM_CUE_DISTANCE = 0.5;   // fraction
+            private const int CONFLICTING_PURSUING_TOLERANCE = 7;   // number of samples
+
+            private static State sLastState = State.Unknown;
+            private static int sConflictringDetectionCount = 0;
 
             private Processor iProcessor;
             private int iDataCount;
@@ -208,7 +212,7 @@ namespace SmoothPursuit
                     iDataCount = aBuffer.Length;
                     iProcessor = new Processor(aBuffer);
 
-                    ComputeState();
+                    sLastState = ComputeState();
                 }
             }
 
@@ -217,6 +221,7 @@ namespace SmoothPursuit
                 return iProcessor == null ? "INVALID TRACK" :
                     new StringBuilder(base.ToString()).
                     AppendFormat("\tC={0}", iDataCount).
+                    AppendFormat("\tCDC={0}", sConflictringDetectionCount).
                     AppendFormat("\tIDs={0:N2}", iProcessor.Increase.DistancesSTD).
                     //AppendFormat("\tISa={0:N2}", iProcessor.Increase.AngleSTD).
                     AppendFormat("\tDDs={0:N2}", iProcessor.Decrease.DistancesSTD).
@@ -243,14 +248,30 @@ namespace SmoothPursuit
                     iTrack.Distance > aCueDistance * (1 - MAX_VAR_FROM_CUE_DISTANCE);
             }
 
-            private void ComputeState()
+            private State ComputeState()
             {
                 bool isIncreasing = IsFollowingMovement(iProcessor.Increase, iCueIncrease.Distance);
                 bool isDecreasing = IsFollowingMovement(iProcessor.Decrease, iCueDecrease.Distance);
 
+                int conflictringDetectionCount = sConflictringDetectionCount;
+                sConflictringDetectionCount = 0;
+
                 if (isIncreasing && isDecreasing)
                 {
-                    State = GetDistance(iCueIncrease.Direction, iTrack.Direction) < GetDistance(iCueDecrease.Direction, iTrack.Direction) ? State.Increase : State.Decrease;
+                    State = sLastState;
+                    State newState = GetDistance(iCueIncrease.Direction, iTrack.Direction) < GetDistance(iCueDecrease.Direction, iTrack.Direction) ? State.Increase : State.Decrease;
+                    
+                    bool isJumpedToAnotherCue = State != State.Unknown && State != newState;
+                    if (isJumpedToAnotherCue)
+                    {
+                        if (conflictringDetectionCount > CONFLICTING_PURSUING_TOLERANCE)
+                        {
+                            conflictringDetectionCount = 0;
+                            State = GetDistance(iCueIncrease.Direction, iTrack.Direction) < GetDistance(iCueDecrease.Direction, iTrack.Direction) ? 
+                                State.Increase : State.Decrease;
+                        }
+                        sConflictringDetectionCount = conflictringDetectionCount + 1;
+                    }
                 }
                 else if (isIncreasing)
                 {
@@ -260,6 +281,8 @@ namespace SmoothPursuit
                 {
                     State = State.Decrease;
                 }
+
+                return State;
             }
 
             private double GetDistance(Point aPoint1, Point aPoint2)

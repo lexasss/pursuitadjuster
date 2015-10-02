@@ -14,10 +14,10 @@ namespace SmoothPursuit
         {
             private static Random iRand = new Random();
 
-            private bool IS_GREYCOLOR = true;
-            private int COLOR_EDGE_GAP = 30;
-            private int COLOR_START_GAP = 30;
-            private int START_VALUE = 128;
+            private const bool IS_GREYCOLOR = true;
+            private const int COLOR_EDGE_GAP = 30;
+            private const int COLOR_START_GAP = 30;
+            private const int START_VALUE = 128;
 
             private long iStartTimestamp = 0;
             private HiResTimestamp iHRTimestamp = new HiResTimestamp();
@@ -30,15 +30,22 @@ namespace SmoothPursuit
             public Color Result { get; private set; }
             public long  Duration { get; private set; }
 
-            public Trial()
+            public Trial(int aTargetValue)
             {
                 ColorComponentIndex = iRand.Next(3);
                 StartValue = START_VALUE;
 
-                do
+                if (aTargetValue < 0)
                 {
-                    TargetValue = COLOR_EDGE_GAP + iRand.Next(256 - 2 * COLOR_EDGE_GAP);
-                } while (START_VALUE - COLOR_START_GAP < TargetValue && TargetValue < START_VALUE + COLOR_START_GAP);
+                    do
+                    {
+                        TargetValue = COLOR_EDGE_GAP + iRand.Next(256 - 2 * COLOR_EDGE_GAP);
+                    } while (START_VALUE - COLOR_START_GAP < TargetValue && TargetValue < START_VALUE + COLOR_START_GAP);
+                }
+                else
+                {
+                    TargetValue = aTargetValue;
+                }
 
                 Target = CreateColor(ColorComponentIndex, TargetValue);
                 Start = CreateColor(ColorComponentIndex, StartValue);
@@ -107,6 +114,7 @@ namespace SmoothPursuit
 
         #region Internal members
 
+        private int[] iPredefinedTargetValues = new int[20];
         private int iTrialCount;
         private int iTrialIndex;
         private List<Trial> iTrials = new List<Trial>();
@@ -149,6 +157,15 @@ namespace SmoothPursuit
         {
             iTrialCount = aTrialCount;
             iTrialIndex = -1;
+
+            for (int i = 0; i < 10; i++)
+            {
+                iPredefinedTargetValues[i] = 28 + i * 8;
+            }
+            for (int i = 0; i < 10; i++)
+            {
+                iPredefinedTargetValues[10 + i] = 156 + i * 8;
+            }
         }
 
         public void start()
@@ -183,10 +200,11 @@ namespace SmoothPursuit
             }
         }
 
-        public void save(string aFileName)
+        public void save(string aFileName, string aHeader)
         {
             using (TextWriter writer = new StreamWriter(aFileName))
             {
+                writer.WriteLine(aHeader);
                 for (int i = 0; i < iTrials.Count; i++)
                 {
                     writer.WriteLine(iTrials[i]);
@@ -204,7 +222,17 @@ namespace SmoothPursuit
             iTrials.Clear();
             for (int i = 0; i < iTrialCount; i++)
             {
-                iTrials.Add(new Trial());
+                iTrials.Add(new Trial(iPredefinedTargetValues[i % iPredefinedTargetValues.Length]));
+            }
+
+            Random rand = new Random();
+            for (int i = 0; i < 2 * iTrialCount; i++)
+            {
+                int idx1 = rand.Next(iTrialCount);
+                int idx2 = rand.Next(iTrialCount);
+                Trial temp = iTrials[idx1];
+                iTrials[idx1] = iTrials[idx2];
+                iTrials[idx2] = temp;
             }
         }
 
