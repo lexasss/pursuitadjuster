@@ -9,8 +9,8 @@ namespace SmoothPursuit.Static
         private class DwellArea
         {
             private const int GAZE_RESPONSIVE_AREA = 160;        // pixels
-            private const int DWELL_TIME = 800;                  // ms
-            private const int ACCUMULATOR_HIST_DURATION = 200;   // ms
+            private const int DWELL_TIME = 600;                  // ms
+            private const int ACCUMULATOR_HIST_DURATION = 100;   // ms
             private const int MAX_ACCUMULATED_TIME = DWELL_TIME + ACCUMULATOR_HIST_DURATION;
             
             private Rectangle iRect;

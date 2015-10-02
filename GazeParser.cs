@@ -26,7 +26,7 @@ namespace SmoothPursuit
         public static int SAMPLE_INTERVAL { get { return 30; } }
 
         private const bool ENSURE_SMOOTH_PURSUIT = true;
-        private const float ALPHA = 1f;
+        private const float ALPHA = 0.5f;
         private const double MIN_FIX_DIST = 70;     // pixels
         private const int MAX_OFFSET = 400;         // pixels
         
@@ -111,7 +111,7 @@ namespace SmoothPursuit
                 double dx = smoothedPoint.X - iLastPoint.X;
                 double dy = smoothedPoint.Y - iLastPoint.Y;
                 double distance = Math.Sqrt(dx * dx + dy * dy);
-                Console.WriteLine("{0:N0}", distance);
+                //Console.WriteLine("{0:N0}", distance);
                 if (distance > MIN_FIX_DIST)
                 {
                     PursueDetector.saccade();

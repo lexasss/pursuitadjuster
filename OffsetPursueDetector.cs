@@ -151,56 +151,82 @@ namespace SmoothPursuit
                 }
             }
 
-            private const double DISTANCE_STD_THRESHOLD = 20.0;     // pixels
+            private class MoveStats
+            {
+                public double Distance { get; private set; }
+                public Point Direction { get; private set; }
+
+                public MoveStats(OffsetGazePoint aFirst, OffsetGazePoint aLast, bool aIsIncrease)
+                {
+                    Point cueFirst = GetCuePoint(aFirst.Location, aIsIncrease ? aFirst.OffsetIncrease : aFirst.OffsetDecrease);
+                    Point cueLast = GetCuePoint(aLast.Location, aIsIncrease ? aLast.OffsetIncrease : aLast.OffsetDecrease);
+                    Distance = GetDistance(cueFirst, cueLast);
+                    Direction = new Point(cueLast.X - cueFirst.X, cueLast.Y - cueFirst.Y);
+                }
+
+                public MoveStats(OffsetGazePoint aFirst, OffsetGazePoint aLast)
+                {
+                    Distance = GetDistance(aFirst.Location, aLast.Location);
+                    Direction = new Point(aLast.Location.X - aFirst.Location.X, aLast.Location.Y - aFirst.Location.Y);
+                }
+
+                private Point GetCuePoint(Point aGazePoint, Point aOffset)
+                {
+                    return new Point(aGazePoint.X - aOffset.X, aGazePoint.Y - aOffset.Y);
+                }
+
+                private double GetDistance(Point aFirst, Point aLast)
+                {
+                    double dx = aLast.X - aFirst.X;
+                    double dy = aLast.Y - aFirst.Y;
+                    return Math.Sqrt(dx * dx + dy * dy);
+                }
+            }
+
+            private const double DISTANCE_STD_THRESHOLD = 15.0;     // pixels
             private const double ANGLE_STD_THRESHOLD = 6.0;         // degrees
             private const double MAX_VAR_FROM_CUE_DISTANCE = 0.3;   // fraction
 
             private Processor iProcessor;
             private int iDataCount;
-            private double iTrackDistance;
-            private double iCueIncreaseDistance;
-            private double iCueDecreaseDistance;
+            private MoveStats iTrack;
+            private MoveStats iCueIncrease;
+            private MoveStats iCueDecrease;
 
             public GazeTrack(OffsetGazePoint[] aBuffer)
                 : base(aBuffer[0], aBuffer[aBuffer.Length - 1])
             {
                 OffsetGazePoint first = aBuffer[0];
                 OffsetGazePoint last = aBuffer[aBuffer.Length - 1];
-                iTrackDistance = GetDistance(first.Location, last.Location);
-                iCueIncreaseDistance = GetDistance(
-                    new Point(first.Location.X - first.OffsetIncrease.X, first.Location.Y - first.OffsetIncrease.Y),
-                    new Point(last.Location.X - last.OffsetIncrease.X, last.Location.Y - last.OffsetIncrease.Y));
-                iCueDecreaseDistance = GetDistance(
-                    new Point(first.Location.X - first.OffsetDecrease.X, first.Location.Y - first.OffsetDecrease.Y),
-                    new Point(last.Location.X - last.OffsetDecrease.X, last.Location.Y - last.OffsetDecrease.Y));
 
-                iDataCount = aBuffer.Length;
-                iProcessor = new Processor(aBuffer);
+                if (first != null && last != null)
+                {
+                    iTrack = new MoveStats(first, last);
+                    iCueIncrease = new MoveStats(first, last, true);
+                    iCueDecrease = new MoveStats(first, last, false);
 
-                bool isIncreasing = IsFollowingMovement(iProcessor.Increase, iCueIncreaseDistance);
-                bool isDecreasing = IsFollowingMovement(iProcessor.Decrease, iCueDecreaseDistance);
-                
-                if (isIncreasing && !isDecreasing)
-                {
-                    State = State.Increase;
-                }
-                else if (isDecreasing && !isIncreasing)
-                {
-                    State = State.Decrease;
+                    iDataCount = aBuffer.Length;
+                    iProcessor = new Processor(aBuffer);
+
+                    ComputeState();
                 }
             }
 
             public override string ToString()
             {
-                return new StringBuilder(base.ToString()).
+                return iProcessor == null ? "INVALID TRACK" :
+                    new StringBuilder(base.ToString()).
                     AppendFormat("\tC={0}", iDataCount).
-                    AppendFormat("\tSid={0:N2}", iProcessor.Increase.DistancesSTD).
-                    AppendFormat("\tSia={0:N2}", iProcessor.Increase.AngleSTD).
-                    AppendFormat("\tSdd={0:N2}", iProcessor.Decrease.DistancesSTD).
-                    AppendFormat("\tSda={0:N2}", iProcessor.Decrease.AngleSTD).
-                    AppendFormat("\tTD={0:N0}", iTrackDistance).
-                    AppendFormat("\tCDi={0:N0}", iCueIncreaseDistance).
-                    AppendFormat("\tCDd={0:N0}", iCueDecreaseDistance).
+                    AppendFormat("\tIDs={0:N2}", iProcessor.Increase.DistancesSTD).
+                    //AppendFormat("\tISa={0:N2}", iProcessor.Increase.AngleSTD).
+                    AppendFormat("\tDDs={0:N2}", iProcessor.Decrease.DistancesSTD).
+                    //AppendFormat("\tDSa={0:N2}", iProcessor.Decrease.AngleSTD).
+                    AppendFormat("\tTD={0:N0}", iTrack.Distance).
+                    AppendFormat("\tTV={0}", iTrack.Direction).
+                    AppendFormat("\tID={0:N0}", iCueIncrease.Distance).
+                    AppendFormat("\tIV={0}", iCueIncrease.Direction).
+                    AppendFormat("\tDD={0:N0}", iCueDecrease.Distance).
+                    AppendFormat("\tDV={0}", iCueDecrease.Direction).
                     ToString();
             }
 
@@ -213,14 +239,33 @@ namespace SmoothPursuit
                     aMovementStats.AngleSTD * aMovementStats.DistancesMean < ANGLE_STD_THRESHOLD : true);
                 */
                 return aMovementStats.DistancesSTD < DISTANCE_STD_THRESHOLD &&
-                    iTrackDistance < aCueDistance * (1 + MAX_VAR_FROM_CUE_DISTANCE) &&
-                    iTrackDistance > aCueDistance * (1 - MAX_VAR_FROM_CUE_DISTANCE);
+                    iTrack.Distance < aCueDistance * (1 + MAX_VAR_FROM_CUE_DISTANCE) &&
+                    iTrack.Distance > aCueDistance * (1 - MAX_VAR_FROM_CUE_DISTANCE);
             }
 
-            private double GetDistance(Point aFirst, Point aLast)
+            private void ComputeState()
             {
-                double dx = aLast.X - aFirst.X;
-                double dy = aLast.Y - aFirst.Y;
+                bool isIncreasing = IsFollowingMovement(iProcessor.Increase, iCueIncrease.Distance);
+                bool isDecreasing = IsFollowingMovement(iProcessor.Decrease, iCueDecrease.Distance);
+
+                if (isIncreasing && isDecreasing)
+                {
+                    State = GetDistance(iCueIncrease.Direction, iTrack.Direction) < GetDistance(iCueDecrease.Direction, iTrack.Direction) ? State.Increase : State.Decrease;
+                }
+                else if (isIncreasing)
+                {
+                    State = State.Increase;
+                }
+                else if (isDecreasing)
+                {
+                    State = State.Decrease;
+                }
+            }
+
+            private double GetDistance(Point aPoint1, Point aPoint2)
+            {
+                double dx = aPoint2.X - aPoint1.X;
+                double dy = aPoint2.Y - aPoint1.Y;
                 return Math.Sqrt(dx * dx + dy * dy);
             }
         }

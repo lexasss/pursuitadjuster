@@ -144,7 +144,7 @@ namespace SmoothPursuit
 
         #region Consts
 
-        protected const int BUFFER_DURATION = 1000;           // ms
+        protected const int BUFFER_DURATION = 600;           // ms
         
         #endregion
 
@@ -203,16 +203,16 @@ namespace SmoothPursuit
                         OnValueChangeRequest(this, new ValueChangeRequestArgs(Direction.Increase));
                     else if (track.isFollowingDecreaseCue())
                         OnValueChangeRequest(this, new ValueChangeRequestArgs(Direction.Decrease));
-                    //Console.WriteLine("{0}\t\t|\t\t{1}", newDataPoint, track);
+                    Console.WriteLine("{0}\t\t|\t\t{1}", newDataPoint, track);
                 }
                 else
                 {
-                    //Console.WriteLine("{0}", iDataBuffer.Count);
+                    Console.WriteLine("{0}", iDataBuffer.Count);
                 }
             }
             else
             {
-                //Console.WriteLine("{0}", aPoint);
+                Console.WriteLine("{0}", aPoint);
             }
         }
 
