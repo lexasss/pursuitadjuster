@@ -100,9 +100,9 @@ namespace SmoothPursuit
 
         public override string ToString()
         {
-            return new StringBuilder().
-                AppendFormat("\tOffsetX={0}", OFFSET_X).
-                AppendFormat("\tOffsetY={0}", OFFSET_Y).
+            return new StringBuilder("PARSER:").
+                AppendFormat("\tOFFS_X\t{0}", OFFSET_X).
+                AppendFormat("\tOFFS_Y\t{0}", OFFSET_Y).
                 ToString();
         }
 

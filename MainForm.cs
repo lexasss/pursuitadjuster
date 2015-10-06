@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Text;
 using System.Windows.Forms;
 using ETUDriver;
 using Utils = GazeInSimSpace.Player;
@@ -233,7 +234,12 @@ namespace SmoothPursuit
             iETUDriver.stopTracking();
             if (sfdSaveData.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                iExperiment.save(sfdSaveData.FileName, iParser.ToString());
+                string header = new StringBuilder().
+                    Append(iParser).
+                    AppendLine().
+                    Append(iGazeControl).
+                    ToString();
+                iExperiment.save(sfdSaveData.FileName, header);
             }
         }
 
@@ -253,8 +259,11 @@ namespace SmoothPursuit
         {
             this.Invoke(new Action(() => { 
                 Experiment.Trial trial = iExperiment.CurrentTrial;
-                int value = (int)aArgs.Current;
-                ConfigLabel(lblColor,  trial.createColor(value), value);
+                if (trial != null)
+                {
+                    int value = (int)aArgs.Current;
+                    ConfigLabel(lblColor, trial.createColor(value), value);
+                }
             }));
         }
 

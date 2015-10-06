@@ -12,7 +12,8 @@ namespace SmoothPursuit
 
         public class Trial
         {
-            private static Random iRand = new Random();
+            private static Random sRand = new Random();
+            private static HiResTimestamp sHRTimestamp = new HiResTimestamp();
 
             private const bool IS_GREYCOLOR = true;
             private const int COLOR_EDGE_GAP = 30;
@@ -20,7 +21,6 @@ namespace SmoothPursuit
             private const int START_VALUE = 128;
 
             private long iStartTimestamp = 0;
-            private HiResTimestamp iHRTimestamp = new HiResTimestamp();
             
             public int ColorComponentIndex { get; private set; }
             public int TargetValue { get; private set; }
@@ -32,14 +32,14 @@ namespace SmoothPursuit
 
             public Trial(int aTargetValue)
             {
-                ColorComponentIndex = iRand.Next(3);
+                ColorComponentIndex = sRand.Next(3);
                 StartValue = START_VALUE;
 
                 if (aTargetValue < 0)
                 {
                     do
                     {
-                        TargetValue = COLOR_EDGE_GAP + iRand.Next(256 - 2 * COLOR_EDGE_GAP);
+                        TargetValue = COLOR_EDGE_GAP + sRand.Next(256 - 2 * COLOR_EDGE_GAP);
                     } while (START_VALUE - COLOR_START_GAP < TargetValue && TargetValue < START_VALUE + COLOR_START_GAP);
                 }
                 else
@@ -58,13 +58,13 @@ namespace SmoothPursuit
 
             public void start()
             {
-                iStartTimestamp = iHRTimestamp.Milliseconds;
+                iStartTimestamp = sHRTimestamp.Milliseconds;
             }
 
             public void stop(Color aColor)
             {
                 Result = aColor;
-                Duration = iHRTimestamp.Milliseconds - iStartTimestamp;
+                Duration = sHRTimestamp.Milliseconds - iStartTimestamp;
             }
 
             public override string ToString()
@@ -81,9 +81,10 @@ namespace SmoothPursuit
                     diff = resultComponents[componentIndex] - targetComponents[componentIndex];
                 }
 
-                return new StringBuilder().
-                    AppendFormat("\t{0},{1},{2}", Target.R, Target.G, Target.B).
-                    AppendFormat("\t{0},{1},{2}", Result.R, Result.G, Result.B).
+                return new StringBuilder("TRIAL").
+                    AppendFormat("\t{0}", StartValue).
+                    AppendFormat("\t{0}", TargetValue).
+                    AppendFormat("\t{0}", TargetValue + diff).
                     AppendFormat("\t{0}", diff).
                     AppendFormat("\t{0}", Duration).
                     ToString();
