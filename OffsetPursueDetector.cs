@@ -183,9 +183,9 @@ namespace SmoothPursuit
                 }
             }
 
-            private const double DISTANCE_STD_THRESHOLD = 15.0;     // pixels
+            private const double DISTANCE_STD_THRESHOLD = 15.0;     // pixels, d=15, increase (20) if too bad tracking
             private const double ANGLE_STD_THRESHOLD = 6.0;         // degrees
-            private const double MAX_VAR_FROM_CUE_DISTANCE = 0.5;   // fraction
+            private const double MAX_VAR_FROM_CUE_DISTANCE = 0.5;   // fraction, d=0.5, decrease (0.3) if too bad tracking
             private const int CONFLICTING_PURSUING_TOLERANCE = 7;   // number of samples
 
             private static State sLastState = State.Unknown;

@@ -27,7 +27,7 @@ namespace SmoothPursuit
         public static int SAMPLE_INTERVAL { get { return 30; } }
 
         private const bool ENSURE_SMOOTH_PURSUIT = true;
-        private const float ALPHA = 0.5f;
+        private const float ALPHA = 0.5f;           // d=0.5, increase (2-3) if too bad tracking
         private const double MIN_FIX_DIST = 70;     // pixels
         private const int MAX_OFFSET = 400;         // pixels
         private const int MIN_OFFSET = 200;         // pixels
