@@ -20,8 +20,8 @@ namespace SmoothPursuit.Static
 
             reset();
 
-            DwellDetector dwellDetector = new DwellDetector(iIncrease.Center, iDecrease.Center);
-            dwellDetector.OnValueChangeRequest += (s, e) => { Value += e.Direction == IPursueDetector.Direction.Increase ? iValueChangeStep : -iValueChangeStep; };
+            Detectors.Dwell dwellDetector = new Detectors.Dwell(iIncrease.Center, iDecrease.Center);
+            dwellDetector.OnValueChangeRequest += (s, e) => { Value += e.Direction == Detectors.IPursueDetector.Direction.Increase ? iValueChangeStep : -iValueChangeStep; };
 
             iPursueDetector = dwellDetector;
         }

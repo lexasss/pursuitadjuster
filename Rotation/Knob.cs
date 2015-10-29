@@ -10,7 +10,7 @@ namespace SmoothPursuit.Rotation
         private const int INDICATOR_OFFSET = 202;       // pixels from the center
         private const float MIN_ANGLE = -135;           // degrees
         private const float MAX_ANGLE = 135;            // degrees
-        private const double TARGET_SPEED = 1.4;        // degrees per step
+        private const double TARGET_SPEED = 1.6;        // degrees per step
         
         #endregion
 
@@ -40,8 +40,8 @@ namespace SmoothPursuit.Rotation
             reset();
 
             //PursueDetector pd = new PursueDetector(iImage.Width / 2, iImage.Height / 2, iIncrease.Radius, iIncrease.Speed * Math.PI / 180);
-            OffsetPursueDetector pd = new OffsetPursueDetector(iIncrease, iDecrease);
-            pd.OnValueChangeRequest += (s, e) => { Value += e.Direction == IPursueDetector.Direction.Increase ? iValueChangeStep : -iValueChangeStep; };
+            Detectors.Offset pd = new Detectors.Offset(iIncrease, iDecrease);
+            pd.OnValueChangeRequest += (s, e) => { Value += e.Direction == Detectors.IPursueDetector.Direction.Increase ? iValueChangeStep : -iValueChangeStep; };
 
             iPursueDetector = pd;
         }

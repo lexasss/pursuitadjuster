@@ -48,7 +48,7 @@ namespace SmoothPursuit
 
         #region Properties
 
-        public IPursueDetector PursueDetector { get; set; }
+        public Detectors.IPursueDetector PursueDetector { get; set; }
         public bool OffsetEnabled { get; set; }
 
         #endregion

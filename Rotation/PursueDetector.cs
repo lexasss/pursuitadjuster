@@ -4,6 +4,7 @@ using System.Drawing;
 
 namespace SmoothPursuit.Rotation
 {
+    /*
     internal class PursueDetector : IPursueDetector
     {
         #region Declarations
@@ -115,5 +116,5 @@ namespace SmoothPursuit.Rotation
         }
 
         #endregion
-    }
+    } */
 }

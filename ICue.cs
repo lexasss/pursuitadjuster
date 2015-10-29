@@ -21,6 +21,7 @@ namespace SmoothPursuit
         private long iLocationY;
         
         //private long iStartTimestamp = 0;
+        //private long iPrevTimestamp = 0;
         //private HiResTimestamp iHRTimestamp = new HiResTimestamp();
         
         // improved timer
@@ -148,6 +149,10 @@ namespace SmoothPursuit
                 UpdateLocation();
                 OnLocationChanged(this, new LocationChangedArgs(Location));
             }
+
+
+            //Console.WriteLine(iHRTimestamp.Milliseconds - iPrevTimestamp);
+            //iPrevTimestamp = iHRTimestamp.Milliseconds;
 
             // Improved timer
             /*

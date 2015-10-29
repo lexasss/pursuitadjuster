@@ -21,7 +21,7 @@ namespace SmoothPursuit
         protected double iValueChangeStep = 1;
         
         protected Image iImage;                     // must be set in the derived class
-        protected IPursueDetector iPursueDetector;  // must be set in the derived class
+        protected Detectors.IPursueDetector iPursueDetector;  // must be set in the derived class
 
         protected ICue iIncrease;   // must be set in the derived class
         protected ICue iDecrease;   // must be set in the derived class
@@ -30,7 +30,7 @@ namespace SmoothPursuit
 
         #region Properties
 
-        public IPursueDetector PursueDetector { get { return iPursueDetector; } }
+        public Detectors.IPursueDetector PursueDetector { get { return iPursueDetector; } }
         public Image Image { get { return iImage; } }
         public double Value
         {

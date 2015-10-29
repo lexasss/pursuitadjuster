@@ -1,8 +1,8 @@
 ﻿using System.Drawing;
 
-namespace SmoothPursuit.Static
+namespace SmoothPursuit.Detectors
 {
-    public class DwellDetector : IPursueDetector
+    public class Dwell : IPursueDetector
     {
         #region Declarations
 
@@ -56,11 +56,11 @@ namespace SmoothPursuit.Static
             public void updateState(bool aIsIncreaseActivated, bool aIsDecreaseActivated)
             {
                 if (aIsIncreaseActivated)
-                    State = IPursueDetector.State.Increase;
+                    State = Detectors.State.Increase;
                 else if (aIsDecreaseActivated)
-                    State = IPursueDetector.State.Decrease;
+                    State = Detectors.State.Decrease;
                 else
-                    State = IPursueDetector.State.Unknown;
+                    State = Detectors.State.Unknown;
             }
         }
 
@@ -76,8 +76,8 @@ namespace SmoothPursuit.Static
 
         #region Public methods
 
-        public DwellDetector(Point aCueIncrease, Point aCueDecrease)
-            : base()
+        public Dwell(Point aCueIncrease, Point aCueDecrease)
+            : base(null, null)
         {
             iIncreaseArea = new DwellArea(aCueIncrease);
             iDecreaseArea = new DwellArea(aCueDecrease);
@@ -88,12 +88,12 @@ namespace SmoothPursuit.Static
 
         #region Internal methods
 
-        protected override IPursueDetector.DataPoint CreateDataPoint(int aTimestamp, Point aPoint)
+        protected override DataPoint CreateDataPoint(int aTimestamp, Point aPoint)
         {
             return new GazePoint(aTimestamp, aPoint);
         }
 
-        protected override IPursueDetector.Track CreateTrack(IPursueDetector.DataPoint aFirstDataPoint, IPursueDetector.DataPoint aLastDataPoint)
+        protected override Track CreateTrack(DataPoint aFirstDataPoint, DataPoint aLastDataPoint)
         {
             GazePoint point = (GazePoint)aLastDataPoint;
             iIncreaseArea.feed(point.Location);

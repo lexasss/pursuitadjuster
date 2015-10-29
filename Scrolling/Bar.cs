@@ -7,7 +7,7 @@ namespace SmoothPursuit.Scrolling
     {
         #region Consts
 
-        private const int TARGET_SPEED = 3;     // pixels per step
+        private const double TARGET_SPEED = 3.7;    // pixels per step
 
         private const int SLIDER_X = 44;
         private const int SLIDER_Y = 330;
@@ -44,8 +44,8 @@ namespace SmoothPursuit.Scrolling
             reset();
 
             //PursueDetector pd = new PursueDetector(new Rectangle(SLIDER_X, SLIDER_Y, SLIDER_WIDTH, SLIDER_HEIGHT), iIncrease.Speed);
-            OffsetPursueDetector pd = new OffsetPursueDetector(iIncrease, iDecrease);
-            pd.OnValueChangeRequest += (s, e) => { Value += e.Direction == IPursueDetector.Direction.Increase ? iValueChangeStep : -iValueChangeStep; };
+            Detectors.Offset pd = new Detectors.Offset(iIncrease, iDecrease);
+            pd.OnValueChangeRequest += (s, e) => { Value += e.Direction == Detectors.IPursueDetector.Direction.Increase ? iValueChangeStep : -iValueChangeStep; };
 
             iPursueDetector = pd;
         }

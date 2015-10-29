@@ -53,9 +53,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Detectors\DataPoint.cs" />
+    <Compile Include="Detectors\GazePoint.cs" />
+    <Compile Include="Detectors\GazeTrack.cs" />
+    <Compile Include="Detectors\OffsetGazePoint.cs" />
+    <Compile Include="Detectors\OffsetXY.cs" />
+    <Compile Include="Detectors\Satte.cs" />
+    <Compile Include="Detectors\SpeedTrack.cs" />
+    <Compile Include="Detectors\Track.cs" />
     <Compile Include="Experiment.cs" />
     <Compile Include="ICue.cs" />
-    <Compile Include="OffsetPursueDetector.cs" />
+    <Compile Include="Detectors\Offset.cs" />
     <Compile Include="Angle.cs" />
     <Compile Include="IGazeControl.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -65,7 +73,7 @@
     </Compile>
     <Compile Include="Rotation\Cue.cs" />
     <Compile Include="Libs\HiResTimestamp.cs" />
-    <Compile Include="IPursueDetector.cs" />
+    <Compile Include="Detectors\IPursueDetector.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -89,7 +97,7 @@
     <Compile Include="Scrolling\PursueDetector.cs" />
     <Compile Include="Static\Control.cs" />
     <Compile Include="Static\Cue.cs" />
-    <Compile Include="Static\DwellDetector.cs" />
+    <Compile Include="Detectors\Dwell.cs" />
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>

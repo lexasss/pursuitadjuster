@@ -3,6 +3,7 @@ using System.Drawing;
 
 namespace SmoothPursuit.Scrolling
 {
+    /*
     internal class PursueDetector : IPursueDetector
     {
         #region Declarations
@@ -77,4 +78,5 @@ namespace SmoothPursuit.Scrolling
 
         #endregion
     }
+     */
 }
