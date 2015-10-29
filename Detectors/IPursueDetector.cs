@@ -24,7 +24,7 @@ namespace SmoothPursuit.Detectors
 
         #region Internal members
 
-        protected Queue<DataPoint> iDataBuffer = new Queue<DataPoint>();
+        protected Queue<Points.Data> iDataBuffer = new Queue<Points.Data>();
         protected bool iReady = false;
 
         protected ICue iCueIncrease;
@@ -72,15 +72,15 @@ namespace SmoothPursuit.Detectors
         {
             LimitBuffer(aTimestamp);
 
-            DataPoint newDataPoint = CreateDataPoint(aTimestamp, aPoint);
+            Points.Data newDataPoint = CreateDataPoint(aTimestamp, aPoint);
             if (newDataPoint != null)
             {
                 iDataBuffer.Enqueue(newDataPoint);
 
                 if (iReady)
                 {
-                    DataPoint firstDataPoint = iDataBuffer.Peek();
-                    Track track = CreateTrack(firstDataPoint, newDataPoint);
+                    Points.Data firstDataPoint = iDataBuffer.Peek();
+                    Tracks.Track track = CreateTrack(firstDataPoint, newDataPoint);
 
                     if (track.isFollowingIncreaseCue())
                         OnValueChangeRequest(this, new ValueChangeRequestArgs(Direction.Increase));
@@ -103,8 +103,8 @@ namespace SmoothPursuit.Detectors
 
         #region Internal methods
 
-        protected abstract DataPoint CreateDataPoint(int aTimestamp, Point aPoint);
-        protected abstract Track CreateTrack(DataPoint aFirstDataPoint, DataPoint aLastDataPoint);
+        protected abstract Points.Data CreateDataPoint(int aTimestamp, Point aPoint);
+        protected abstract Tracks.Track CreateTrack(Points.Data aFirstDataPoint, Points.Data aLastDataPoint);
 
         private void LimitBuffer(int aTimestamp)
         {

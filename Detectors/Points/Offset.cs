@@ -1,14 +1,14 @@
 ﻿using System.Drawing;
 using System.Text;
 
-namespace SmoothPursuit.Detectors
+namespace SmoothPursuit.Detectors.Points
 {
-    internal class OffsetGazePoint : GazePoint
+    internal class Offset : Gaze
     {
         public Point OffsetIncrease { get; private set; }
         public Point OffsetDecrease { get; private set; }
 
-        public OffsetGazePoint(int aTimestamp, Point aLocation, Point aOffsetIncrease, Point aOffsetDecrease)
+        public Offset(int aTimestamp, Point aLocation, Point aOffsetIncrease, Point aOffsetDecrease)
             : base(aTimestamp, aLocation)
         {
             OffsetIncrease = aOffsetIncrease;

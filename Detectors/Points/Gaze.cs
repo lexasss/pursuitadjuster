@@ -1,13 +1,13 @@
 ﻿using System.Drawing;
 using System.Text;
 
-namespace SmoothPursuit.Detectors
+namespace SmoothPursuit.Detectors.Points
 {
-    internal class GazePoint : DataPoint
+    internal class Gaze : Data
     {
         public Point Location { get; private set; }
 
-        public GazePoint(int aTimestamp, Point aLocation)
+        public Gaze(int aTimestamp, Point aLocation)
             : base(aTimestamp)
         {
             Location = aLocation;

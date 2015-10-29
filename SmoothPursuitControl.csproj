@@ -53,14 +53,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Detectors\DataPoint.cs" />
-    <Compile Include="Detectors\GazePoint.cs" />
-    <Compile Include="Detectors\GazeTrack.cs" />
-    <Compile Include="Detectors\OffsetGazePoint.cs" />
+    <Compile Include="Detectors\Points\Data.cs" />
+    <Compile Include="Detectors\Points\Gaze.cs" />
+    <Compile Include="Detectors\Tracks\Dwell.cs" />
+    <Compile Include="Detectors\Tracks\GazeTrack.cs" />
+    <Compile Include="Detectors\Points\Offset.cs" />
     <Compile Include="Detectors\OffsetXY.cs" />
-    <Compile Include="Detectors\Satte.cs" />
-    <Compile Include="Detectors\SpeedTrack.cs" />
-    <Compile Include="Detectors\Track.cs" />
+    <Compile Include="Detectors\State.cs" />
+    <Compile Include="Detectors\Tracks\Speed.cs" />
+    <Compile Include="Detectors\Tracks\Track.cs" />
     <Compile Include="Experiment.cs" />
     <Compile Include="ICue.cs" />
     <Compile Include="Detectors\Offset.cs" />

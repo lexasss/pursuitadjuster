@@ -13,24 +13,24 @@ namespace SmoothPursuit.Detectors
 
         #region Internal methods
 
-        protected override DataPoint CreateDataPoint(int aTimestamp, Point aPoint)
+        protected override Points.Data CreateDataPoint(int aTimestamp, Point aPoint)
         {
             Point cueIncrease = iCueIncrease.Location;
             Point cueDecrease = iCueDecrease.Location;
-            return new OffsetGazePoint(aTimestamp, aPoint,
+            return new Points.Offset(aTimestamp, aPoint,
                 new Point(aPoint.X - cueIncrease.X, aPoint.Y - cueIncrease.Y),
                 new Point(aPoint.X - cueDecrease.X, aPoint.Y - cueDecrease.Y));
         }
 
-        protected override Track CreateTrack(DataPoint aFirstDataPoint, DataPoint aLastDataPoint)
+        protected override Tracks.Track CreateTrack(Points.Data aFirstDataPoint, Points.Data aLastDataPoint)
         {
-            List<OffsetGazePoint> gazePoints = new List<OffsetGazePoint>();
-            foreach (DataPoint point in iDataBuffer.ToArray())
+            List<Points.Offset> gazePoints = new List<Points.Offset>();
+            foreach (Points.Data point in iDataBuffer.ToArray())
             {
-                gazePoints.Add((OffsetGazePoint)point);
+                gazePoints.Add((Points.Offset)point);
             }
 
-            return new GazeTrack(gazePoints.ToArray());
+            return new Tracks.Gaze(gazePoints.ToArray());
         }
 
         #endregion

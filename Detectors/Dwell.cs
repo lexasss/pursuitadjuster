@@ -46,31 +46,13 @@ namespace SmoothPursuit.Detectors
             }
         }
 
-        private class DwellTrack : Track
-        {
-            public DwellTrack()
-                : base(null, null)
-            {
-            }
-
-            public void updateState(bool aIsIncreaseActivated, bool aIsDecreaseActivated)
-            {
-                if (aIsIncreaseActivated)
-                    State = Detectors.State.Increase;
-                else if (aIsDecreaseActivated)
-                    State = Detectors.State.Decrease;
-                else
-                    State = Detectors.State.Unknown;
-            }
-        }
-
         #endregion
 
         #region Internal members
 
         private DwellArea iIncreaseArea;
         private DwellArea iDecreaseArea;
-        private DwellTrack iTrack;
+        private Tracks.Dwell iTrack;
 
         #endregion
 
@@ -81,21 +63,21 @@ namespace SmoothPursuit.Detectors
         {
             iIncreaseArea = new DwellArea(aCueIncrease);
             iDecreaseArea = new DwellArea(aCueDecrease);
-            iTrack = new DwellTrack();
+            iTrack = new Tracks.Dwell();
         }
 
         #endregion
 
         #region Internal methods
 
-        protected override DataPoint CreateDataPoint(int aTimestamp, Point aPoint)
+        protected override Points.Data CreateDataPoint(int aTimestamp, Point aPoint)
         {
-            return new GazePoint(aTimestamp, aPoint);
+            return new Points.Gaze(aTimestamp, aPoint);
         }
 
-        protected override Track CreateTrack(DataPoint aFirstDataPoint, DataPoint aLastDataPoint)
+        protected override Tracks.Track CreateTrack(Points.Data aFirstDataPoint, Points.Data aLastDataPoint)
         {
-            GazePoint point = (GazePoint)aLastDataPoint;
+            Points.Gaze point = (Points.Gaze)aLastDataPoint;
             iIncreaseArea.feed(point.Location);
             iDecreaseArea.feed(point.Location);
             iTrack.updateState(iIncreaseArea.Activated, iDecreaseArea.Activated);

@@ -1,16 +1,16 @@
 ﻿using System.Text;
 
-namespace SmoothPursuit.Detectors
+namespace SmoothPursuit.Detectors.Tracks
 {
-    internal abstract class SpeedTrack : Track
+    internal abstract class Speed : Track
     {
         public const double SPEED_ERROR_THRESHOLD = 0.4;   // fraction
 
         protected double iExpectedSpeed;
 
-        public double Speed { get { return GetLength() * 1000 / Duration; } }   // per second
+        public double Value { get { return GetLength() * 1000 / Duration; } }   // per second
 
-        public SpeedTrack(DataPoint aFirst, DataPoint aLast, double aExpectedSpeed)
+        public Speed(Points.Data aFirst, Points.Data aLast, double aExpectedSpeed)
             : base(aFirst, aLast)
         {
             iExpectedSpeed = aExpectedSpeed;
@@ -39,7 +39,7 @@ namespace SmoothPursuit.Detectors
         public override string ToString()
         {
             return new StringBuilder(base.ToString()).
-                AppendFormat("\t{0,8:N3}", Speed).
+                AppendFormat("\t{0,8:N3}", Value).
                 ToString();
         }
 
@@ -47,7 +47,7 @@ namespace SmoothPursuit.Detectors
 
         protected bool IsMovingWithSpeed(double aMinSpeed, double aMaxSpeed)
         {
-            var speed = this.Speed;
+            var speed = this.Value;
             return aMinSpeed <= speed && speed <= aMaxSpeed;
         }
     }

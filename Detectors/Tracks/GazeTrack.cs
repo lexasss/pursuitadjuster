@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 
-namespace SmoothPursuit.Detectors
+namespace SmoothPursuit.Detectors.Tracks
 {
-    internal class GazeTrack : Track
+    internal class Gaze : Track
     {
         #region Declarations
 
@@ -108,14 +108,14 @@ namespace SmoothPursuit.Detectors
             public MovementStats Increase { get; private set; }
             public MovementStats Decrease { get; private set; }
 
-            public Processor(OffsetGazePoint[] aBuffer)
+            public Processor(Points.Offset[] aBuffer)
             {
                 Distances increaseDistances = new Distances();
                 Distances decreaseDistances = new Distances();
                 Angles increaseAngles = new Angles();
                 Angles decreaseAngles = new Angles();
 
-                foreach (OffsetGazePoint point in aBuffer)
+                foreach (Points.Offset point in aBuffer)
                 {
                     increaseDistances.feed(point.OffsetIncrease);
                     decreaseDistances.feed(point.OffsetDecrease);
@@ -133,7 +133,7 @@ namespace SmoothPursuit.Detectors
             public double Distance { get; private set; }
             public Point Direction { get; private set; }
 
-            public MoveStats(OffsetGazePoint aFirst, OffsetGazePoint aLast, bool aIsIncrease)
+            public MoveStats(Points.Offset aFirst, Points.Offset aLast, bool aIsIncrease)
             {
                 Point cueFirst = GetCuePoint(aFirst.Location, aIsIncrease ? aFirst.OffsetIncrease : aFirst.OffsetDecrease);
                 Point cueLast = GetCuePoint(aLast.Location, aIsIncrease ? aLast.OffsetIncrease : aLast.OffsetDecrease);
@@ -141,7 +141,7 @@ namespace SmoothPursuit.Detectors
                 Direction = new Point(cueLast.X - cueFirst.X, cueLast.Y - cueFirst.Y);
             }
 
-            public MoveStats(OffsetGazePoint aFirst, OffsetGazePoint aLast)
+            public MoveStats(Points.Offset aFirst, Points.Offset aLast)
             {
                 Distance = GetDistance(aFirst.Location, aLast.Location);
                 Direction = new Point(aLast.Location.X - aFirst.Location.X, aLast.Location.Y - aFirst.Location.Y);
@@ -186,11 +186,11 @@ namespace SmoothPursuit.Detectors
 
         #region Public methods
 
-        public GazeTrack(OffsetGazePoint[] aBuffer)
+        public Gaze(Points.Offset[] aBuffer)
             : base(aBuffer[0], aBuffer[aBuffer.Length - 1])
         {
-            OffsetGazePoint first = aBuffer[0];
-            OffsetGazePoint last = aBuffer[aBuffer.Length - 1];
+            Points.Offset first = aBuffer[0];
+            Points.Offset last = aBuffer[aBuffer.Length - 1];
 
             if (first != null && last != null)
             {

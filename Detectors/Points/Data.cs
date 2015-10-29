@@ -1,12 +1,12 @@
 ﻿using System.Text;
 
-namespace SmoothPursuit.Detectors
+namespace SmoothPursuit.Detectors.Points
 {
-    public class DataPoint
+    public class Data
     {
         public int Timestamp { get; private set; }
 
-        public DataPoint(int aTimestamp)
+        public Data(int aTimestamp)
         {
             Timestamp = aTimestamp;
         }

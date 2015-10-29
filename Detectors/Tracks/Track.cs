@@ -1,13 +1,13 @@
 ﻿using System.Text;
 
-namespace SmoothPursuit.Detectors
+namespace SmoothPursuit.Detectors.Tracks
 {
     public abstract class Track
     {
         public State State { get; protected set; }
         public int Duration { get; private set; }
 
-        public Track(DataPoint aFirst, DataPoint aLast)
+        public Track(Points.Data aFirst, Points.Data aLast)
         {
             State = State.Unknown;
             if (aLast != null && aFirst != null)
