@@ -92,10 +92,8 @@
     <Compile Include="Player\WavPlayer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Rotation\PursueDetector.cs" />
     <Compile Include="Scrolling\Bar.cs" />
     <Compile Include="Scrolling\Cue.cs" />
-    <Compile Include="Scrolling\PursueDetector.cs" />
     <Compile Include="Static\Control.cs" />
     <Compile Include="Static\Cue.cs" />
     <Compile Include="Detectors\Dwell.cs" />

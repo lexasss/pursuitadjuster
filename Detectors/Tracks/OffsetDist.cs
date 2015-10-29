@@ -176,9 +176,6 @@ namespace SmoothPursuit.Detectors.Tracks
 
         #region Internal members
 
-        private static State sLastState = State.Unknown;
-        private static int sConflictringDetectionCount = 0;
-
         private MoveStats iTrack;
         private MoveStats iCueIncrease;
         private MoveStats iCueDecrease;
@@ -212,8 +209,6 @@ namespace SmoothPursuit.Detectors.Tracks
         {
             return iProcessor == null ? "INVALID TRACK" :
                 new StringBuilder(base.ToString()).
-                AppendFormat("\tC={0}", iDataCount).
-                AppendFormat("\tCDC={0}", sConflictringDetectionCount).
                 AppendFormat("\tIDs={0:N2}", iProcessor.Increase.DistancesSTD).
                 //AppendFormat("\tISa={0:N2}", iProcessor.Increase.AngleSTD).
                 AppendFormat("\tDDs={0:N2}", iProcessor.Decrease.DistancesSTD).

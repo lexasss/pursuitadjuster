@@ -48,7 +48,7 @@ namespace SmoothPursuit.Detectors.Tracks
 
         #region Internal members
 
-        private static State sLastState = State.Unknown;
+        protected static State sLastState = State.Unknown;
         private static int sConflictringDetectionCount = 0;
 
         protected int iDataCount = 0;
