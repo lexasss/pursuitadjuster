@@ -42,9 +42,9 @@ namespace SmoothPursuit.Detectors
         #endregion
     }
 
-    public class OffsetA : Offset<Tracks.OffsetXY, Tracks.MovementStatsXY, Tracks.Processor<Tracks.MovementStatsXY>>
+    public class OffsetXY : Offset<Tracks.OffsetXY, Tracks.MovementStatsXY, Tracks.Processor<Tracks.MovementStatsXY>>
     {
-        public OffsetA(ICue aCueIncrease, ICue aCueDecrease)
+        public OffsetXY(ICue aCueIncrease, ICue aCueDecrease)
             : base(aCueIncrease, aCueDecrease) { }
         
         public override string ToString()
@@ -53,9 +53,9 @@ namespace SmoothPursuit.Detectors
         }
     }
 
-    public class OffsetB : Offset<Tracks.Offset2, Tracks.MovementStats2, Tracks.Processor2>
+    public class OffsetDist : Offset<Tracks.OffsetDist, Tracks.MovementStatsDist, Tracks.ProcessorDist>
     {
-        public OffsetB(ICue aCueIncrease, ICue aCueDecrease)
+        public OffsetDist(ICue aCueIncrease, ICue aCueDecrease)
             : base(aCueIncrease, aCueDecrease) { }
 
         public override string ToString()

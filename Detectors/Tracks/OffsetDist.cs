@@ -83,7 +83,7 @@ namespace SmoothPursuit.Detectors.Tracks
         }
     }
 
-    public class MovementStats2 : MovementStats
+    public class MovementStatsDist : MovementStats
     {
         public double DistancesMean { get; private set; }
         public double DistancesSTD { get; private set; }
@@ -104,7 +104,7 @@ namespace SmoothPursuit.Detectors.Tracks
         }
     }
 
-    public class Processor2 : Processor<MovementStats2>
+    public class ProcessorDist : Processor<MovementStatsDist>
     {
         public override void compute(Points.Offset[] aBuffer)
         {
@@ -121,14 +121,14 @@ namespace SmoothPursuit.Detectors.Tracks
                 //decreaseAngles.feed(point.OffsetDecrease);
             }
 
-            Increase = new MovementStats2();
+            Increase = new MovementStatsDist();
             Increase.compute(increaseDistances, increaseAngles);
-            Decrease = new MovementStats2();
+            Decrease = new MovementStatsDist();
             Decrease.compute(decreaseDistances, decreaseAngles);
         }
     }
 
-    public class Offset2 : Offset<MovementStats2, Processor2>
+    public class OffsetDist : Offset<MovementStatsDist, ProcessorDist>
     {
         #region Declarations
 
@@ -168,10 +168,9 @@ namespace SmoothPursuit.Detectors.Tracks
 
         #region Constants
 
-        private const double DISTANCE_STD_THRESHOLD = 15.0;     // pixels, d=15, increase (20) if too bad tracking
+        private const double DISTANCE_STD_THRESHOLD = 25.0;     // pixels, d=15, increase (20) if too bad tracking
         private const double ANGLE_STD_THRESHOLD = 6.0;         // degrees
         private const double MAX_VAR_FROM_CUE_DISTANCE = 0.5;   // fraction, d=0.5, decrease (0.3) if too bad tracking
-        private const int CONFLICTING_PURSUING_TOLERANCE = 7;   // number of samples
 
         #endregion
 
@@ -202,7 +201,7 @@ namespace SmoothPursuit.Detectors.Tracks
                 iCueDecrease = new MoveStats(first, last, false);
 
                 iDataCount = aBuffer.Length;
-                iProcessor = new Processor2();
+                iProcessor = new ProcessorDist();
                 iProcessor.compute(aBuffer);
 
                 sLastState = ComputeState();
@@ -232,7 +231,7 @@ namespace SmoothPursuit.Detectors.Tracks
 
         #region Internal methods
 
-        protected override bool IsFollowingMovement(MovementStats2 aMovementStats)
+        protected override bool IsFollowingMovement(MovementStatsDist aMovementStats)
         {
             // check distance STD against threshold, and also angle STD if the distance is long enough
             /*

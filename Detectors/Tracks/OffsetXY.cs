@@ -47,7 +47,7 @@ namespace SmoothPursuit.Detectors.Tracks
     {
         #region Constants
 
-        private const double DISTANCE_STD_THRESHOLD = 15.0;     // pixels, default=25
+        private const double DISTANCE_STD_THRESHOLD = 25.0;     // pixels, default=25
 
         #endregion
 

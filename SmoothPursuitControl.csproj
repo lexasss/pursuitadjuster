@@ -56,9 +56,8 @@
     <Compile Include="Detectors\Points\Gaze.cs" />
     <Compile Include="Detectors\Tracks\Dwell.cs" />
     <Compile Include="Detectors\Tracks\Offset.cs" />
-    <Compile Include="Detectors\Tracks\Offset2.cs" />
+    <Compile Include="Detectors\Tracks\OffsetDist.cs" />
     <Compile Include="Detectors\Points\Offset.cs" />
-    <Compile Include="Detectors\OffsetXY.cs" />
     <Compile Include="Detectors\State.cs" />
     <Compile Include="Detectors\Tracks\OffsetXY.cs" />
     <Compile Include="Detectors\Tracks\Speed.cs" />
