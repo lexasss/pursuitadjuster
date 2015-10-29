@@ -44,7 +44,7 @@ namespace SmoothPursuit.Scrolling
             reset();
 
             //PursueDetector pd = new PursueDetector(new Rectangle(SLIDER_X, SLIDER_Y, SLIDER_WIDTH, SLIDER_HEIGHT), iIncrease.Speed);
-            Detectors.Offset pd = new Detectors.Offset(iIncrease, iDecrease);
+            Detectors.OffsetA pd = new Detectors.OffsetA(iIncrease, iDecrease);
             pd.OnValueChangeRequest += (s, e) => { Value += e.Direction == Detectors.IPursueDetector.Direction.Increase ? iValueChangeStep : -iValueChangeStep; };
 
             iPursueDetector = pd;

@@ -70,16 +70,10 @@ namespace SmoothPursuit.Detectors
 
         #region Internal methods
 
-        protected override Points.Data CreateDataPoint(int aTimestamp, Point aPoint)
+        protected override Tracks.Track CreateTrack(Points.Gaze aNewGazePoint)
         {
-            return new Points.Gaze(aTimestamp, aPoint);
-        }
-
-        protected override Tracks.Track CreateTrack(Points.Data aFirstDataPoint, Points.Data aLastDataPoint)
-        {
-            Points.Gaze point = (Points.Gaze)aLastDataPoint;
-            iIncreaseArea.feed(point.Location);
-            iDecreaseArea.feed(point.Location);
+            iIncreaseArea.feed(aNewGazePoint.Location);
+            iDecreaseArea.feed(aNewGazePoint.Location);
             iTrack.updateState(iIncreaseArea.Activated, iDecreaseArea.Activated);
             return iTrack;
         }

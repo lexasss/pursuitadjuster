@@ -2,6 +2,7 @@
 
 namespace SmoothPursuit.Detectors.Tracks
 {
+    /*
     internal abstract class Speed : Track
     {
         public const double SPEED_ERROR_THRESHOLD = 0.4;   // fraction
@@ -10,7 +11,7 @@ namespace SmoothPursuit.Detectors.Tracks
 
         public double Value { get { return GetLength() * 1000 / Duration; } }   // per second
 
-        public Speed(Points.Data aFirst, Points.Data aLast, double aExpectedSpeed)
+        public Speed(Points.Gaze aFirst, Points.Gaze aLast, double aExpectedSpeed)
             : base(aFirst, aLast)
         {
             iExpectedSpeed = aExpectedSpeed;
@@ -51,4 +52,5 @@ namespace SmoothPursuit.Detectors.Tracks
             return aMinSpeed <= speed && speed <= aMaxSpeed;
         }
     }
+     * */
 }

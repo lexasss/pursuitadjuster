@@ -3,6 +3,7 @@ using System.Drawing;
 
 namespace SmoothPursuit.Detectors
 {
+    /*
     public class OffsetXY : IPursueDetector
     {
         public OffsetXY(ICue aCueIncrease, ICue aCueDecrease)
@@ -10,7 +11,7 @@ namespace SmoothPursuit.Detectors
 
         #region Internal methods
 
-        protected override Points.Data CreateDataPoint(int aTimestamp, Point aPoint)
+        protected override Points.Gaze CreateGazePoint(int aTimestamp, Point aPoint)
         {
             Point cueIncrease = iCueIncrease.Location;
             Point cueDecrease = iCueDecrease.Location;
@@ -19,10 +20,10 @@ namespace SmoothPursuit.Detectors
                 new Point(aPoint.X - cueDecrease.X, aPoint.Y - cueDecrease.Y));
         }
 
-        protected override Tracks.Track CreateTrack(Points.Data aFirstDataPoint, Points.Data aLastDataPoint)
+        protected override Tracks.Track CreateTrack(Points.Gaze aNewGazePoint)
         {
             List<Points.Offset> gazePoints = new List<Points.Offset>();
-            foreach (Points.Data point in iDataBuffer.ToArray())
+            foreach (Points.Gaze point in iDataBuffer.ToArray())
             {
                 gazePoints.Add((Points.Offset)point);
             }
@@ -31,5 +32,5 @@ namespace SmoothPursuit.Detectors
         }
 
         #endregion
-    }
+    }*/
 }

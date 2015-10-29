@@ -3,19 +3,21 @@ using System.Text;
 
 namespace SmoothPursuit.Detectors.Points
 {
-    internal class Gaze : Data
+    public class Gaze
     {
+        public int Timestamp { get; private set; }
         public Point Location { get; private set; }
 
         public Gaze(int aTimestamp, Point aLocation)
-            : base(aTimestamp)
         {
+            Timestamp = aTimestamp;
             Location = aLocation;
         }
 
         public override string ToString()
         {
-            return new StringBuilder(base.ToString()).
+            return new StringBuilder().
+                AppendFormat("{0}", Timestamp).
                 AppendFormat("\t{0},{1}", Location.X, Location.Y).
                 ToString();
         }

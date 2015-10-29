@@ -3,7 +3,7 @@ using System.Text;
 
 namespace SmoothPursuit.Detectors.Points
 {
-    internal class Offset : Gaze
+    public class Offset : Gaze
     {
         public Point OffsetIncrease { get; private set; }
         public Point OffsetDecrease { get; private set; }

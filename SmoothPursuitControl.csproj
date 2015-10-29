@@ -53,10 +53,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Detectors\Points\Data.cs" />
     <Compile Include="Detectors\Points\Gaze.cs" />
     <Compile Include="Detectors\Tracks\Dwell.cs" />
-    <Compile Include="Detectors\Tracks\Gaze.cs" />
+    <Compile Include="Detectors\Tracks\Offset.cs" />
+    <Compile Include="Detectors\Tracks\Offset2.cs" />
     <Compile Include="Detectors\Points\Offset.cs" />
     <Compile Include="Detectors\OffsetXY.cs" />
     <Compile Include="Detectors\State.cs" />

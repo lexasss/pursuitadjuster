@@ -7,9 +7,19 @@ namespace SmoothPursuit.Detectors.Tracks
         public State State { get; protected set; }
         public int Duration { get; private set; }
 
-        public Track(Points.Data aFirst, Points.Data aLast)
+        public Track()
         {
             State = State.Unknown;
+        }
+
+        public Track(Points.Gaze aFirst, Points.Gaze aLast)
+        {
+            State = State.Unknown;
+            init(aFirst, aLast);
+        }
+
+        public virtual void init(Points.Gaze aFirst, Points.Gaze aLast)
+        {
             if (aLast != null && aFirst != null)
             {
                 Duration = aLast.Timestamp - aFirst.Timestamp;
