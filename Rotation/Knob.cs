@@ -40,7 +40,7 @@ namespace SmoothPursuit.Rotation
             reset();
 
             //PursueDetector pd = new PursueDetector(iImage.Width / 2, iImage.Height / 2, iIncrease.Radius, iIncrease.Speed * Math.PI / 180);
-            Detectors.Offset pd = new Detectors.Offset(iIncrease, iDecrease);
+            Detectors.OffsetXY pd = new Detectors.OffsetXY(iIncrease, iDecrease);
             pd.OnValueChangeRequest += (s, e) => { Value += e.Direction == Detectors.IPursueDetector.Direction.Increase ? iValueChangeStep : -iValueChangeStep; };
 
             iPursueDetector = pd;

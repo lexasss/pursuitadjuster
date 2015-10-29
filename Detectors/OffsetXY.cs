@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SmoothPursuit.Detectors
 {
@@ -30,7 +27,7 @@ namespace SmoothPursuit.Detectors
                 gazePoints.Add((Points.Offset)point);
             }
 
-            return new Tracks.Gaze(gazePoints.ToArray());
+            return new Tracks.OffsetXY(gazePoints.ToArray());
         }
 
         #endregion

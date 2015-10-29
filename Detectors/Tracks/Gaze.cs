@@ -9,7 +9,7 @@ namespace SmoothPursuit.Detectors.Tracks
     {
         #region Declarations
 
-        private abstract class Data<T>
+        protected abstract class Data<T>
         {
             protected List<T> iValues = new List<T>();
             protected double iSum = 0;
@@ -45,7 +45,7 @@ namespace SmoothPursuit.Detectors.Tracks
             protected abstract T ConvertOffsetToData(Point aOffset);
         }
 
-        private class Distances : Data<double>
+        protected class Distances : Data<double>
         {
             private const double ALPHA = 1.0;
 
@@ -68,7 +68,7 @@ namespace SmoothPursuit.Detectors.Tracks
             }
         }
 
-        private class Angles : Data<Angle>
+        protected class Angles : Data<Angle>
         {
             private static int AngleCycle = 0;
             private static Angle LastAngle = new Angle();
@@ -87,7 +87,7 @@ namespace SmoothPursuit.Detectors.Tracks
             }
         }
 
-        private class MovementStats
+        protected class MovementStats
         {
             public double DistancesMean { get; private set; }
             public double DistancesSTD { get; private set; }
@@ -103,7 +103,7 @@ namespace SmoothPursuit.Detectors.Tracks
             }
         }
 
-        private class Processor
+        protected class Processor
         {
             public MovementStats Increase { get; private set; }
             public MovementStats Decrease { get; private set; }
@@ -128,7 +128,7 @@ namespace SmoothPursuit.Detectors.Tracks
             }
         }
 
-        private class MoveStats
+        protected class MoveStats
         {
             public double Distance { get; private set; }
             public Point Direction { get; private set; }
@@ -260,8 +260,7 @@ namespace SmoothPursuit.Detectors.Tracks
                     if (conflictringDetectionCount > CONFLICTING_PURSUING_TOLERANCE)
                     {
                         conflictringDetectionCount = 0;
-                        State = GetDistance(iCueIncrease.Direction, iTrack.Direction) < GetDistance(iCueDecrease.Direction, iTrack.Direction) ?
-                            State.Increase : State.Decrease;
+                        State = newState;
                     }
                     sConflictringDetectionCount = conflictringDetectionCount + 1;
                 }

@@ -56,10 +56,11 @@
     <Compile Include="Detectors\Points\Data.cs" />
     <Compile Include="Detectors\Points\Gaze.cs" />
     <Compile Include="Detectors\Tracks\Dwell.cs" />
-    <Compile Include="Detectors\Tracks\GazeTrack.cs" />
+    <Compile Include="Detectors\Tracks\Gaze.cs" />
     <Compile Include="Detectors\Points\Offset.cs" />
     <Compile Include="Detectors\OffsetXY.cs" />
     <Compile Include="Detectors\State.cs" />
+    <Compile Include="Detectors\Tracks\OffsetXY.cs" />
     <Compile Include="Detectors\Tracks\Speed.cs" />
     <Compile Include="Detectors\Tracks\Track.cs" />
     <Compile Include="Experiment.cs" />
