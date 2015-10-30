@@ -26,6 +26,10 @@ namespace SmoothPursuit.Static
             iPursueDetector = dwellDetector;
         }
 
+        public override void setPursueDetectorType(Detectors.Type aType)
+        {
+        }
+
         public override string ToString()
         {
             return "STATIC";

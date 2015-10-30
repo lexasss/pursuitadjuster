@@ -5,6 +5,12 @@ using System.Text;
 
 namespace SmoothPursuit.Detectors.Tracks
 {
+    public enum CueType
+    {
+        Increase,
+        Decrease
+    }
+
     public abstract class Data<T>
     {
         protected List<T> iValues = new List<T>();
@@ -83,8 +89,42 @@ namespace SmoothPursuit.Detectors.Tracks
         }
     }
 
+    public class Movement
+    {
+        public double Distance { get; private set; }
+        public Point Direction { get; private set; }
+
+        public Movement(Points.Offset aFirst, Points.Offset aLast, bool aIsIncrease)
+        {
+            Point cueFirst = GetCuePoint(aFirst.Location, aIsIncrease ? aFirst.OffsetIncrease : aFirst.OffsetDecrease);
+            Point cueLast = GetCuePoint(aLast.Location, aIsIncrease ? aLast.OffsetIncrease : aLast.OffsetDecrease);
+            Distance = GetDistance(cueFirst, cueLast);
+            Direction = new Point(cueLast.X - cueFirst.X, cueLast.Y - cueFirst.Y);
+        }
+
+        public Movement(Points.Offset aFirst, Points.Offset aLast)
+        {
+            Distance = GetDistance(aFirst.Location, aLast.Location);
+            Direction = new Point(aLast.Location.X - aFirst.Location.X, aLast.Location.Y - aFirst.Location.Y);
+        }
+
+        private Point GetCuePoint(Point aGazePoint, Point aOffset)
+        {
+            return new Point(aGazePoint.X - aOffset.X, aGazePoint.Y - aOffset.Y);
+        }
+
+        private double GetDistance(Point aFirst, Point aLast)
+        {
+            double dx = aLast.X - aFirst.X;
+            double dy = aLast.Y - aFirst.Y;
+            return Math.Sqrt(dx * dx + dy * dy);
+        }
+    }
+
     public class MovementStatsDist : MovementStats
     {
+        public Movement Cue { get; private set; }
+
         public double DistancesMean { get; private set; }
         public double DistancesSTD { get; private set; }
         public double AngleMean { get; private set; }
@@ -102,12 +142,20 @@ namespace SmoothPursuit.Detectors.Tracks
             AngleMean = aAngles.Mean;
             AngleSTD = aAngles.STD;
         }
+
+        public void createCueMovementStats(Points.Offset aFirst, Points.Offset aLast, CueType aType)
+        {
+            Cue = new Movement(aFirst, aLast, aType == CueType.Increase);
+        }
     }
 
     public class ProcessorDist : Processor<MovementStatsDist>
     {
         public override void compute(Points.Offset[] aBuffer)
         {
+            Points.Offset first = aBuffer[0];
+            Points.Offset last = aBuffer[aBuffer.Length - 1];
+
             Distances increaseDistances = new Distances();
             Distances decreaseDistances = new Distances();
             Angles increaseAngles = new Angles();
@@ -122,8 +170,11 @@ namespace SmoothPursuit.Detectors.Tracks
             }
 
             Increase = new MovementStatsDist();
+            Increase.createCueMovementStats(first, last, CueType.Increase);
             Increase.compute(increaseDistances, increaseAngles);
+            
             Decrease = new MovementStatsDist();
+            Decrease.createCueMovementStats(first, last, CueType.Decrease);
             Decrease.compute(decreaseDistances, decreaseAngles);
         }
     }
@@ -132,43 +183,12 @@ namespace SmoothPursuit.Detectors.Tracks
     {
         #region Declarations
 
-        protected class MoveStats
-        {
-            public double Distance { get; private set; }
-            public Point Direction { get; private set; }
-
-            public MoveStats(Points.Offset aFirst, Points.Offset aLast, bool aIsIncrease)
-            {
-                Point cueFirst = GetCuePoint(aFirst.Location, aIsIncrease ? aFirst.OffsetIncrease : aFirst.OffsetDecrease);
-                Point cueLast = GetCuePoint(aLast.Location, aIsIncrease ? aLast.OffsetIncrease : aLast.OffsetDecrease);
-                Distance = GetDistance(cueFirst, cueLast);
-                Direction = new Point(cueLast.X - cueFirst.X, cueLast.Y - cueFirst.Y);
-            }
-
-            public MoveStats(Points.Offset aFirst, Points.Offset aLast)
-            {
-                Distance = GetDistance(aFirst.Location, aLast.Location);
-                Direction = new Point(aLast.Location.X - aFirst.Location.X, aLast.Location.Y - aFirst.Location.Y);
-            }
-
-            private Point GetCuePoint(Point aGazePoint, Point aOffset)
-            {
-                return new Point(aGazePoint.X - aOffset.X, aGazePoint.Y - aOffset.Y);
-            }
-
-            private double GetDistance(Point aFirst, Point aLast)
-            {
-                double dx = aLast.X - aFirst.X;
-                double dy = aLast.Y - aFirst.Y;
-                return Math.Sqrt(dx * dx + dy * dy);
-            }
-        }
 
         #endregion
 
         #region Constants
 
-        private const double DISTANCE_STD_THRESHOLD = 25.0;     // pixels, d=15, increase (20) if too bad tracking
+        private const double DISTANCE_STD_THRESHOLD = 15.0;     // pixels, d=15, increase (20) if too bad tracking
         private const double ANGLE_STD_THRESHOLD = 6.0;         // degrees
         private const double MAX_VAR_FROM_CUE_DISTANCE = 0.5;   // fraction, d=0.5, decrease (0.3) if too bad tracking
 
@@ -176,9 +196,7 @@ namespace SmoothPursuit.Detectors.Tracks
 
         #region Internal members
 
-        private MoveStats iTrack;
-        private MoveStats iCueIncrease;
-        private MoveStats iCueDecrease;
+        private Movement iTrack;
 
         #endregion
 
@@ -189,13 +207,11 @@ namespace SmoothPursuit.Detectors.Tracks
             Points.Offset first = aBuffer[0];
             Points.Offset last = aBuffer[aBuffer.Length - 1];
 
+            base.init(first, last);
+
             if (first != null && last != null)
             {
-                base.init(first, last);
-                
-                iTrack = new MoveStats(first, last);
-                iCueIncrease = new MoveStats(first, last, true);
-                iCueDecrease = new MoveStats(first, last, false);
+                iTrack = new Movement(first, last);
 
                 iDataCount = aBuffer.Length;
                 iProcessor = new ProcessorDist();
@@ -215,10 +231,10 @@ namespace SmoothPursuit.Detectors.Tracks
                 //AppendFormat("\tDSa={0:N2}", iProcessor.Decrease.AngleSTD).
                 AppendFormat("\tTD={0:N0}", iTrack.Distance).
                 AppendFormat("\tTV={0}", iTrack.Direction).
-                AppendFormat("\tID={0:N0}", iCueIncrease.Distance).
-                AppendFormat("\tIV={0}", iCueIncrease.Direction).
-                AppendFormat("\tDD={0:N0}", iCueDecrease.Distance).
-                AppendFormat("\tDV={0}", iCueDecrease.Direction).
+                AppendFormat("\tID={0:N0}", iProcessor.Increase.Cue.Distance).
+                AppendFormat("\tIV={0}", iProcessor.Increase.Cue.Direction).
+                AppendFormat("\tDD={0:N0}", iProcessor.Decrease.Cue.Distance).
+                AppendFormat("\tDV={0}", iProcessor.Decrease.Cue.Direction).
                 ToString();
         }
 
@@ -234,15 +250,15 @@ namespace SmoothPursuit.Detectors.Tracks
                 aMovementStats.DistancesMean > 5 * DISTANCE_STD_THRESHOLD ?
                 aMovementStats.AngleSTD * aMovementStats.DistancesMean < ANGLE_STD_THRESHOLD : true);
             */
-            double cueDistance = aMovementStats == iProcessor.Increase ? iCueIncrease.Distance : iCueDecrease.Distance;
             return aMovementStats.DistancesSTD < DISTANCE_STD_THRESHOLD &&
-                iTrack.Distance < cueDistance * (1 + MAX_VAR_FROM_CUE_DISTANCE) &&
-                iTrack.Distance > cueDistance * (1 - MAX_VAR_FROM_CUE_DISTANCE);
+                iTrack.Distance < aMovementStats.Cue.Distance * (1 + MAX_VAR_FROM_CUE_DISTANCE) &&
+                iTrack.Distance > aMovementStats.Cue.Distance * (1 - MAX_VAR_FROM_CUE_DISTANCE);
         }
 
         protected override bool IsIncreaseCloserThanDecrease()
         {
-            return GetDistance(iCueIncrease.Direction, iTrack.Direction) < GetDistance(iCueDecrease.Direction, iTrack.Direction);
+            return GetDistance(iProcessor.Increase.Cue.Direction, iTrack.Direction) <
+                GetDistance(iProcessor.Decrease.Cue.Direction, iTrack.Direction);
         }
 
         private double GetDistance(Point aPoint1, Point aPoint2)

@@ -12,7 +12,7 @@ namespace SmoothPursuit.Detectors
         public Offset(ICue aCueIncrease, ICue aCueDecrease)
             : base(aCueIncrease, aCueDecrease)
         {
-            Console.WriteLine(this);
+            Console.WriteLine("Pursuit detector: " + this.ToString());
         }
 
         #region Internal methods
@@ -49,7 +49,7 @@ namespace SmoothPursuit.Detectors
         
         public override string ToString()
         {
-            return "OffsetA";
+            return "Offset-XY";
         }
     }
 
@@ -60,7 +60,7 @@ namespace SmoothPursuit.Detectors
 
         public override string ToString()
         {
-            return "OffsetB";
+            return "Offset-Dist";
         }
     }
 }

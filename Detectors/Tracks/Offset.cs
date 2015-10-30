@@ -63,10 +63,10 @@ namespace SmoothPursuit.Detectors.Tracks
             Points.Offset first = aBuffer[0];
             Points.Offset last = aBuffer[aBuffer.Length - 1];
 
+            base.init(first, last);
+
             if (first != null && last != null)
             {
-                base.init(first, last);
-
                 iDataCount = aBuffer.Length;
                 iProcessor = Activator.CreateInstance<P>(); 
                 iProcessor.compute(aBuffer);

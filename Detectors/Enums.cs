@@ -6,4 +6,10 @@
         Decrease,
         Increase
     };
+
+    public enum Type
+    {
+        OffsetXY,
+        OffsetDist
+    }
 }

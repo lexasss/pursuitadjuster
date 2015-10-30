@@ -82,6 +82,24 @@ namespace SmoothPursuit
 
         #region Public methods
 
+        public virtual void setPursueDetectorType(Detectors.Type aType)
+        {
+            Detectors.IPursueDetector pd;
+            switch (aType)
+            {
+                case Detectors.Type.OffsetXY:
+                    pd = new Detectors.OffsetXY(iIncrease, iDecrease);
+                    break;
+                case Detectors.Type.OffsetDist:
+                    pd = new Detectors.OffsetDist(iIncrease, iDecrease);
+                    break;
+                default:
+                    throw new NotSupportedException(this.ToString() + " do not support this detector");
+            }
+            pd.OnValueChangeRequest += (s, e) => { Value += e.Direction == Detectors.IPursueDetector.Direction.Increase ? iValueChangeStep : -iValueChangeStep; };
+            iPursueDetector = pd;
+        }
+        
         public virtual void start()
         {
             iIncrease.show();

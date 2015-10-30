@@ -25,6 +25,7 @@ namespace SmoothPursuit
         private GazeParser iParser;
         private Utils.Player iPlayer;
         private IGazeControl iGazeControl;  // set only using SetGazeControl
+        private Detectors.Type iPursueDetectorType;
         private Experiment iExperiment;
 
         private Rotation.Knob iKnob;
@@ -35,10 +36,10 @@ namespace SmoothPursuit
         private int iGazeControlIndex = -1;
 
         private TheCodeKing.ActiveButtons.Controls.IActiveMenu iMenu;
-        private TheCodeKing.ActiveButtons.Controls.ActiveButton mbnOptions;
+        private TheCodeKing.ActiveButtons.Controls.ActiveButton mbnETUDOptions;
         private TheCodeKing.ActiveButtons.Controls.ActiveButton mbnCalibrate;
         private TheCodeKing.ActiveButtons.Controls.ActiveButton mbnToggleTracking;
-        private TheCodeKing.ActiveButtons.Controls.ActiveButton mbnToggleStimuli;
+        private TheCodeKing.ActiveButtons.Controls.ActiveButton mbnOptions;
 
         #endregion
 
@@ -83,6 +84,7 @@ namespace SmoothPursuit
             iParser = new GazeParser();
 
             SetGazeControl();
+            SetPursueDetectorType();
 
             iPlayer = new Utils.WavPlayer();
             iPlayer.init();
@@ -103,9 +105,9 @@ namespace SmoothPursuit
             return index;
         }
 
-        private void SetGazeControl()
+        private void SetGazeControl(int aIndex = -1)
         {
-            iGazeControlIndex = GetNextGazeControlIndex();
+            iGazeControlIndex = aIndex < 0 ? GetNextGazeControlIndex() : aIndex;
 
             iGazeControl = iGazeControls[iGazeControlIndex];
             iParser.PursueDetector = iGazeControl.PursueDetector;
@@ -114,15 +116,24 @@ namespace SmoothPursuit
             pcbControl.Image = iGazeControl.Image;
             pcbControl.Visible = !CONTROL_INVISIBLE_WHEN_NOT_TRACKING;
 
-            mbnToggleStimuli.Text = String.Format("Switch to {0}", iGazeControls[GetNextGazeControlIndex()]);
+            //mbnOptions.Text = String.Format("Switch to {0}", iGazeControls[GetNextGazeControlIndex()]);
+        }
+
+        private void SetPursueDetectorType(Detectors.Type aType = Detectors.Type.OffsetXY)
+        {
+            iPursueDetectorType = aType;
+            foreach (IGazeControl gazeControl in iGazeControls)
+            {
+                gazeControl.setPursueDetectorType(iPursueDetectorType);
+            }
         }
 
         private void EnabledMenuButtons()
         {
-            mbnOptions.Enabled = iETUDriver.DeviceCount > 0 && iETUDriver.Active == 0;
+            mbnETUDOptions.Enabled = iETUDriver.DeviceCount > 0 && iETUDriver.Active == 0;
             mbnCalibrate.Enabled = iETUDriver.Ready != 0 && iETUDriver.Active == 0;
             mbnToggleTracking.Enabled = iETUDriver.Ready != 0 && iETUDriver.Calibrated != 0;
-            mbnToggleStimuli.Enabled = iETUDriver.Active == 0;
+            mbnOptions.Enabled = iETUDriver.Active == 0;
         }
 
         private void CreateMenu()
@@ -130,9 +141,9 @@ namespace SmoothPursuit
             iMenu = TheCodeKing.ActiveButtons.Controls.ActiveMenu.GetInstance(this);
             iMenu.Alighment = HorizontalAlignment.Center;
 
-            mbnOptions = new TheCodeKing.ActiveButtons.Controls.ActiveButton();
-            mbnOptions.Text = "Options";
-            mbnOptions.Click += (s, e) =>
+            mbnETUDOptions = new TheCodeKing.ActiveButtons.Controls.ActiveButton();
+            mbnETUDOptions.Text = "ETUDriver";
+            mbnETUDOptions.Click += (s, e) =>
             {
                 iETUDriver.showRecordingOptions();
                 EnabledMenuButtons();
@@ -163,16 +174,24 @@ namespace SmoothPursuit
                 }
             };
 
-            mbnToggleStimuli = new TheCodeKing.ActiveButtons.Controls.ActiveButton();
-            mbnToggleStimuli.Click += (s, e) =>
+            mbnOptions = new TheCodeKing.ActiveButtons.Controls.ActiveButton();
+            mbnOptions.Text = "Options";
+            mbnOptions.Click += (s, e) =>
             {
-                SetGazeControl();
+                Options options = new Options();
+                options.Widget = iGazeControlIndex;
+                options.PursueDetector = iPursueDetectorType;
+                if (options.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    SetGazeControl(options.Widget);
+                    SetPursueDetectorType(options.PursueDetector);
+                }
             };
 
-            iMenu.Items.Add(mbnToggleStimuli);
+            iMenu.Items.Add(mbnOptions);
             iMenu.Items.Add(mbnToggleTracking);
             iMenu.Items.Add(mbnCalibrate);
-            iMenu.Items.Add(mbnOptions);
+            iMenu.Items.Add(mbnETUDOptions);
         }
 
         private void ConfigLabel(Label aLabel, Color aColor, int aValue)
