@@ -3,6 +3,13 @@ using System.Drawing;
 
 namespace SmoothPursuit
 {
+    public enum GazeControlType
+    {
+        Knob,
+        Scrollbar,
+        Static
+    }
+
     public abstract class IGazeControl
     {
         #region Consts

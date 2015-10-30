@@ -181,11 +181,6 @@ namespace SmoothPursuit.Detectors.Tracks
 
     public class OffsetDist : Offset<MovementStatsDist, ProcessorDist>
     {
-        #region Declarations
-
-
-        #endregion
-
         #region Constants
 
         private const double DISTANCE_STD_THRESHOLD = 15.0;     // pixels, d=15, increase (20) if too bad tracking

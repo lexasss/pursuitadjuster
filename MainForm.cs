@@ -24,16 +24,16 @@ namespace SmoothPursuit
         private CoETUDriver iETUDriver;
         private GazeParser iParser;
         private Utils.Player iPlayer;
-        private IGazeControl iGazeControl;  // set only using SetGazeControl
-        private Detectors.Type iPursueDetectorType;
+        private IGazeControl iGazeControl;              // use SetGazeControl to set
+        private Detectors.Type iPursueDetectorType;     // use SetPursueDetectorType to set
         private Experiment iExperiment;
 
         private Rotation.Knob iKnob;
         private Scrolling.Bar iScrollbar;
         private Static.Control iStaticControl;
 
-        private List<IGazeControl> iGazeControls = new List<IGazeControl>();
-        private int iGazeControlIndex = -1;
+        private Dictionary<GazeControlType, IGazeControl> iGazeControls = new Dictionary<GazeControlType, IGazeControl>();
+        private GazeControlType iGazeControlType;
 
         private TheCodeKing.ActiveButtons.Controls.IActiveMenu iMenu;
         private TheCodeKing.ActiveButtons.Controls.ActiveButton mbnETUDOptions;
@@ -77,9 +77,9 @@ namespace SmoothPursuit
             iStaticControl.OnSoundPlayRequest += GazeControl_OnSoundPlayRequest;
             iStaticControl.OnRedraw += GazeControl_OnRedraw;
 
-            iGazeControls.Add(iKnob);
-            iGazeControls.Add(iScrollbar);
-            iGazeControls.Add(iStaticControl);
+            iGazeControls.Add(GazeControlType.Knob, iKnob);
+            iGazeControls.Add(GazeControlType.Scrollbar, iScrollbar);
+            iGazeControls.Add(GazeControlType.Static, iStaticControl);
 
             iParser = new GazeParser();
 
@@ -96,33 +96,22 @@ namespace SmoothPursuit
 
         #region Internal methods
 
-        private int GetNextGazeControlIndex()
+        private void SetGazeControl(GazeControlType aType = GazeControlType.Knob)
         {
-            int index = iGazeControlIndex + 1;
-            if (index < 0 || iGazeControls.Count <= index)
-                index = 0;
+            iGazeControlType = aType;
 
-            return index;
-        }
-
-        private void SetGazeControl(int aIndex = -1)
-        {
-            iGazeControlIndex = aIndex < 0 ? GetNextGazeControlIndex() : aIndex;
-
-            iGazeControl = iGazeControls[iGazeControlIndex];
+            iGazeControl = iGazeControls[iGazeControlType];
             iParser.PursueDetector = iGazeControl.PursueDetector;
             iParser.OffsetEnabled = iGazeControl != iStaticControl;
             
             pcbControl.Image = iGazeControl.Image;
             pcbControl.Visible = !CONTROL_INVISIBLE_WHEN_NOT_TRACKING;
-
-            //mbnOptions.Text = String.Format("Switch to {0}", iGazeControls[GetNextGazeControlIndex()]);
         }
 
         private void SetPursueDetectorType(Detectors.Type aType = Detectors.Type.OffsetXY)
         {
             iPursueDetectorType = aType;
-            foreach (IGazeControl gazeControl in iGazeControls)
+            foreach (IGazeControl gazeControl in iGazeControls.Values)
             {
                 gazeControl.setPursueDetectorType(iPursueDetectorType);
             }
@@ -179,7 +168,7 @@ namespace SmoothPursuit
             mbnOptions.Click += (s, e) =>
             {
                 Options options = new Options();
-                options.Widget = iGazeControlIndex;
+                options.Widget = iGazeControlType;
                 options.PursueDetector = iPursueDetectorType;
                 if (options.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
