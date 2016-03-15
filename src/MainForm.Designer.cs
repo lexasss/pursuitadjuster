@@ -55,6 +55,7 @@
             this.lblTargetColor.Size = new System.Drawing.Size(100, 50);
             this.lblTargetColor.TabIndex = 1;
             this.lblTargetColor.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblTargetColor.Visible = false;
             // 
             // lblColor
             // 
@@ -66,6 +67,7 @@
             this.lblColor.Size = new System.Drawing.Size(100, 50);
             this.lblColor.TabIndex = 2;
             this.lblColor.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblColor.Visible = false;
             // 
             // sfdSaveData
             // 

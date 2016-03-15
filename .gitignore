@@ -1,6 +1,7 @@
-obj/**
+**/obj/**
 *.suo
-bin/**
-!bin/**/*.exe
-!bin/**/sounds/*
-**/*.psd
+src/bin/**
+!src/bin/**/*.exe
+!src/bin/**/sounds/*
+src/**/*.psd
+**/.vs/**

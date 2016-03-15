@@ -14,6 +14,8 @@ namespace SmoothPursuit
     {
         #region Consts
 
+        protected const double VALUE_CHANGE_STEP = 1.5;
+
         protected const double MAX_VALUE = 255;
         private const uint VOLUME_MIN = 1;
         private const uint VOLUME_MAX = 16;
@@ -25,8 +27,6 @@ namespace SmoothPursuit
 
         private double iValue = -1;
 
-        protected double iValueChangeStep = 1;
-        
         protected Image iImage;                     // must be set in the derived class
         protected Detectors.IPursueDetector iPursueDetector;  // must be set in the derived class
 
@@ -103,7 +103,7 @@ namespace SmoothPursuit
                 default:
                     throw new NotSupportedException(this.ToString() + " do not support this detector");
             }
-            pd.OnValueChangeRequest += (s, e) => { Value += e.Direction == Detectors.IPursueDetector.Direction.Increase ? iValueChangeStep : -iValueChangeStep; };
+            pd.OnValueChangeRequest += (s, e) => { Value += e.Direction == Detectors.IPursueDetector.Direction.Increase ? VALUE_CHANGE_STEP : -VALUE_CHANGE_STEP; };
             iPursueDetector = pd;
         }
         

@@ -10,7 +10,7 @@ namespace SmoothPursuit.Rotation
         private const int INDICATOR_OFFSET = 202;       // pixels from the center
         private const float MIN_ANGLE = -135;           // degrees
         private const float MAX_ANGLE = 135;            // degrees
-        private const double TARGET_SPEED = 1.6;        // degrees per step
+        private const double TARGET_SPEED = 1.6;          // degrees per step
         
         #endregion
 
